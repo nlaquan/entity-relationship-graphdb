@@ -39,7 +39,7 @@ async function createNews(file) {
  * @return
  */
 async function importFile(file) {
-  const url = `import`;
+  const url = 'import';
   const formData = new FormData()
   formData.append('file', file);
 
@@ -47,8 +47,17 @@ async function importFile(file) {
     .then(res => res);
 }
 
+async function newsByTime(startDate, endDate) {
+  const url = `news/time?start=${startDate}&end=${endDate}`
+  return api.get(url)
+    .then((res) => {
+      return res.data;
+    });
+}
+
 export {
   news,
+  newsByTime,
   importFile,
   createNews,
   newsHasEntityAndRelationship

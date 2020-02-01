@@ -10,12 +10,11 @@ import {
   NewsHasEntityAndRelationship,
   EntityWithRelationshipByMonth,
   EntityWithRelationshipByQuarter,
-  MergeEntity
+  MergeEntity,
+  NewsByTime
 } from './Questions';
 import ListGroup from 'react-bootstrap/ListGroup';
 import CreateNews from './News';
-import { baseURL } from './api/config';
-// import { Collapse, EndpointTable } from './component';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
@@ -31,7 +30,7 @@ const questions = [{
   content: 'Liệt kê các thực thể có quan hệ với thực thể e trong một hoặc nhiều bản tin'
 }, {
   id: 'q4',
-  content: 'Liệt kê ra các thực thể loại T (Person, Country)  và mối quan hệ giữa chúng trong một bản tin',
+  content: 'Liệt kê ra các thực thể loại T (Person, Country)  và mối quan hệ giữa chúng trong một hoặc nhiều bản tin',
 }, {
   id: 'q5',
   content: 'Số lần một thực thể e được đề cập đến trong một hoặc nhiều bản tin',
@@ -56,6 +55,9 @@ const questions = [{
 }, {
   id: 'q12',
   content: 'Lưu trữ thực thể (import json file)'
+}, {
+  id: 'q13',
+  content: 'Liệt kê các thực thể và mối quan hệ giữa chúng trong một hoặc nhiều bản tin theo thời gian'
 }];
 
 function getQuestion(questionId) {
@@ -77,7 +79,8 @@ const QUESTION_COMPONENTS = {
   q9: EntityWithRelationshipByMonth,
   q10: EntityWithRelationshipByQuarter,
   q11: MergeEntity,
-  q12: CreateNews
+  q12: CreateNews,
+  q13: NewsByTime
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -198,6 +201,15 @@ const API_DES = {
     method: "POST",
     params: {
       file: 'File chứa bản tin và các thực thể, quan hệ được trích xuất từ bản tin này'
+    }
+  },
+  q13: {
+    description: "Truy vấn bản tin theo thời gian",
+    endpoint: '/news/time',
+    method: "GET",
+    params: {
+      start: 'Thời gian bắt đầu',
+      end: 'Thời gian kết thúc'
     }
   },
 }

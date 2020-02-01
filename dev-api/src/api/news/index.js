@@ -79,12 +79,11 @@ function NewsAPI(service) {
   }
 
   async function getNewsByTime(req, res) {
-    console.log('run this');
-    const { from, to } = req.query;
+    const { start, end } = req.query;
 
     try {
       withTryCatch({
-        promise: async () => await service.getNewsByTime(from, to),
+        promise: async () => await service.getNewsByTime(start, end),
         onSuccess: (responsedData) => res.send(responsedData),
         onError: (err) => res.send(err)
       });

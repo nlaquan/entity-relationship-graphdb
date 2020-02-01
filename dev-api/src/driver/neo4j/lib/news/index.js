@@ -192,15 +192,16 @@ const importFile = driver => async (jsonArray) => {
     })
 }
 
-const getNewsByTime = driver => (from, to) => {
+const getNewsByTime = driver => (start, end) => {
   const session = driver.session();
   const keys = ['n', 'r1', 'f', 'r2', 'o'];
 
   const queryString =
-    `match (n:News)-[r1]->(f)-[r2]->(o) where n.extractedDate >= date(${toDateObject(from)})
-    and n.extractedDate <= date(${toDateObject(to)})
-    return n, r1, f, r2, o;
-  `
+    `match (n:News)-[r1]->(f)-[r2]->(o) where n.extractedDate >= date(${toDateObject(start)})
+    and n.extractedDate <= date(${toDateObject(end)})
+    return n, r1, f, r2, o;`
+
+  console.log('query', queryString);
 
   return session.run(queryString)
     .then(result => {

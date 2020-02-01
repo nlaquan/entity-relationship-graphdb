@@ -37,7 +37,6 @@ function EntityWithType({ question, apiDes }) {
     event.preventDefault();
     const _labels = labels.map(l => l.value);
     const _links = links.split(',').map(id => id.trim()).filter(id => id !== "");
-    console.log('run run run');
     entityWithType({ links: _links, labels: _labels })
       .then(res => {
         setState(state => ({ ...state, result: res }));

@@ -13,7 +13,6 @@ async function entity({ label, name, isExact }) {
 }
 
 async function entityWithType({ links, labels }) {
-  console.log('new with entity type');
   const url = `/news_with_entity_type?links=${links.join(',')}&labels=${labels.join(',')}`;
 
   return api.get(url)
@@ -83,7 +82,6 @@ async function entityWithRelationshipByQuarter({
 }
 
 async function entityWithOtherEntityInNews({ links, id }) {
-  console.log('run');
   const url =
     `entity_has_rel_with_others_in_news?links=${links.join(',')}&id=${id}`;
 
