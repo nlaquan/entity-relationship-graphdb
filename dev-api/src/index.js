@@ -37,7 +37,7 @@ app.patch(`/${base}/location/:id`,
   (req, res) => locationAPI.updateLocation(req, res)
 )
 
-app.get(`/${base}/statistic`,
+app.get(`/${base}/statistics`,
   (req, res) => entityAPI.statistic(req, res)
 )
 

@@ -1,38 +1,31 @@
 import React, { useState } from 'react';
-import { newsByTime } from '../api/news';
+import { statism } from '../api/entity';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ReactJson from 'react-json-view';
 import { EndpointTable } from '../component';
-import DatePicker from "react-datepicker";
-import 'react-datepicker/dist/react-datepicker.css';
 
 const DEFAULT_STATE = {
-  start: new Date(),
-  end: new Date(),
+  ids: '',
   result: {}
 };
 
-function NewsByTime({ question, apiDes }) {
+function Statistics({ question, apiDes }) {
   const [state, setState] = useState(DEFAULT_STATE);
-  const { start, end, result } = state;
+  const { ids, result } = state;
 
-  const setStartDate = (date) => {
-    setState(state => ({ ...state, start: date }))
-  }
-
-  const setEndDate = (date) => {
-    setState(state => ({ ...state, end: date }))
-  }
+  const onChange = (event) => {
+    const { name, value } = event.target;
+    setState(state => ({ ...state, [name]: value }));
+  };
 
   const onSubmit = (event) => {
     event.preventDefault();
-    const startDate = start.toLocaleDateString('sv-SE');
-    const endDate = end.toLocaleDateString('sv-SE');
+    const _ids = ids.split(',').map(id => id.trim()).filter(id => id !== "");
 
-    newsByTime(startDate, endDate)
+    statism(_ids)
       .then(res => {
         setState(state => ({ ...state, result: res }));
       })
@@ -49,8 +42,9 @@ function NewsByTime({ question, apiDes }) {
         </div>
         <b>Mô tả</b>
         <div>
-          Service liệt kê các thực thể và mối quan hệ giữa chúng trong một bản tin
-          nhận đầu vào là danh sách <b>links</b> của các bản tin cần truy vấn.
+          Service thống kê các thực thể kèm theo xuất hiện trong bao nhiêu bản tin,
+          xuất hiện bao nhiêu lần. Service nhận đầu vào là <b>ids</b> - danh sách id của các thực
+          thể cần thống kê
         </div>
         <hr />
         <div className="endpoint">
@@ -64,22 +58,15 @@ function NewsByTime({ question, apiDes }) {
         <h3>Demo</h3>
         <Form onSubmit={onSubmit}>
           <Form.Group as={Row}>
-            <Form.Label column sm="3">Thời gian bắt đầu</Form.Label>
+            <Form.Label column sm="3">Bản tin</Form.Label>
             <Col sm="9">
-              <DatePicker
-                selected={start}
-                onChange={date => setStartDate(date)}
-                dateFormat="yyyy-MM-dd"
-              />
-            </Col>
-          </Form.Group>
-          <Form.Group as={Row}>
-            <Form.Label column sm="3">Thời gian kết thúc</Form.Label>
-            <Col sm="9">
-              <DatePicker
-                selected={end}
-                onChange={date => setEndDate(date)}
-                dateFormat="yyyy-MM-dd"
+              <Form.Control
+                type="text"
+                as="textarea"
+                name="ids"
+                placeholder="IDs"
+                onChange={onChange}
+                value={ids}
               />
             </Col>
           </Form.Group>
@@ -94,4 +81,4 @@ function NewsByTime({ question, apiDes }) {
   );
 }
 
-export default NewsByTime;
+export default Statistics;

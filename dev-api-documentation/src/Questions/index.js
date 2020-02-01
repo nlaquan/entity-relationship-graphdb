@@ -10,6 +10,8 @@ import EntityWithRelationshipByQuarter from './EntityWithRelationshipByQuarter';
 import NewsHasEntityAndRelationship from './NewsHasEntityAndRelationship';
 import MergeEntity from './MergeEntity';
 import NewsByTime from './NewsByTime';
+import Statistics from './Statistics';
+import Location from './Location';
 
 export {
   News,
@@ -23,5 +25,7 @@ export {
   EntityWithRelationshipByMonth,
   EntityWithRelationshipByQuarter,
   MergeEntity,
-  NewsByTime
+  NewsByTime,
+  Statistics,
+  Location
 }

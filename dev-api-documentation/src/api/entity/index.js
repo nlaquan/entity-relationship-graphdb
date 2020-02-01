@@ -101,6 +101,20 @@ async function mergeEntity(ids) {
     })
 }
 
+async function statism(ids) {
+  const url = `statistics?ids=${ids.join(',')}`;
+
+  return api.get(url)
+    .then(res => res.data)
+}
+
+async function updateLocation({ id, lat, long }) {
+  const url = `location/${id}`;
+
+  return api.patch(url, { lat: lat, long: long })
+    .then(res => res.data);
+}
+
 export {
   entity,
   entityWithType,
@@ -110,5 +124,7 @@ export {
   entityWithRelationship,
   entityWithRelationshipByMonth,
   entityWithRelationshipByQuarter,
-  mergeEntity
+  mergeEntity,
+  statism,
+  updateLocation
 }

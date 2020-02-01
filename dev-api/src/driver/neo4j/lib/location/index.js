@@ -1,6 +1,9 @@
 const updateLocation = driver => ({ id, lat, long }) => {
   const session = driver.session();
 
+  console.log('lat', lat);
+  console.log('long', long);
+
   const queryString =
     `match (l:Location) where ID(l) = ${id}
      set l += {lat: "${lat}", long: "${long}"}

@@ -16,7 +16,7 @@ function LocationAPI(service) {
 
   async function updateLocation(req, res) {
     const { id } = req.params;
-    const { long, lat } = req.query;
+    const { long, lat } = req.body;
 
     try {
       withTryCatch({

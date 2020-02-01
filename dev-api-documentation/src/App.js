@@ -11,7 +11,9 @@ import {
   EntityWithRelationshipByMonth,
   EntityWithRelationshipByQuarter,
   MergeEntity,
-  NewsByTime
+  NewsByTime,
+  Statistics,
+  Location
 } from './Questions';
 import ListGroup from 'react-bootstrap/ListGroup';
 import CreateNews from './News';
@@ -58,6 +60,12 @@ const questions = [{
 }, {
   id: 'q13',
   content: 'Liệt kê các thực thể và mối quan hệ giữa chúng trong một hoặc nhiều bản tin theo thời gian'
+}, {
+  id: 'q14',
+  content: 'Thống kê thông tin về một tập các thực thể kèm theo xuất hiện trong bao nhiêu bản tin, xuất hiện bao nhiêu lần'
+}, {
+  id: 'q15',
+  content: 'Cập nhật thông tin về tạo độ của thực thể vị trí'
 }];
 
 function getQuestion(questionId) {
@@ -80,7 +88,9 @@ const QUESTION_COMPONENTS = {
   q10: EntityWithRelationshipByQuarter,
   q11: MergeEntity,
   q12: CreateNews,
-  q13: NewsByTime
+  q13: NewsByTime,
+  q14: Statistics,
+  q15: Location
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -212,6 +222,22 @@ const API_DES = {
       end: 'Thời gian kết thúc'
     }
   },
+  q14: {
+    description: "Thống kê thông tin về một tập các thực thể kèm theo xuất hiện trong bao nhiêu bản tin, xuất hiện bao nhiêu lần",
+    endpoint: '/statistics',
+    method: "GET",
+    params: {
+      ids: 'Danh sách id của các thực thể cần thống kê',
+    }
+  },
+  q15: {
+    description: "Cập nhật toạ độ cho các thực thể vị trí",
+    endpoint: '/location',
+    method: "PATCH",
+    params: {
+      id: 'ID của thực thể vị trí',
+    }
+  }
 }
 
 function App() {
