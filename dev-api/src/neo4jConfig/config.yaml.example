@@ -1,0 +1,10 @@
+# Config for neo4j service
+
+# IP:port or domain:port of server in neo4j (Standalone Databse or Core Server)
+domain: ip:port
+# user and password to login neo4j if Core Server require authenticate
+user: neo4j
+password: neo4j
+# Neo4j database mode: single|cluster
+# mode: cluster
+mode: single

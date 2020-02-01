@@ -1,0 +1,13 @@
+{
+  "entities": {
+    "Person": 5
+  },
+  "facts": [
+    {
+      "type": "MEET",
+      "subject": "Person",
+      "object": "Person",
+      "amount": 10
+    }
+  ]
+}

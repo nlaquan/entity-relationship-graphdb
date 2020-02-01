@@ -1,0 +1,71 @@
+{
+  "entities": {
+    "Person": 1000,
+    "Agreement": 300000,
+    "Event": 500000,
+    "Country": 1000,
+    "Location": 10000
+  },
+  "facts": [
+    {
+      "type": "MEET",
+      "subject": "Person",
+      "object": "Person",
+      "amount": 1000000
+    },
+    {
+      "type": "VISIT",
+      "subject": "Person",
+      "object": "Country",
+      "amount": 1000000
+    },
+    {
+      "type": "ORGANIZE",
+      "subject": "Person",
+      "object": "Event",
+      "amount": 1000000
+    },
+    {
+      "type": "SPEAK",
+      "subject": "Person",
+      "object": "Agreement",
+      "amount": 1000000
+    },
+    {
+      "type": "SUPPORT",
+      "subject": "Person",
+      "object": "Event",
+      "amount": 1000000
+    },
+    {
+      "type": "OPPOSE",
+      "subject": "Country",
+      "object": "Event",
+      "amount": 1000000
+    },
+    {
+      "type": "TAKE_PART",
+      "subject": "Person",
+      "object": "Event",
+      "amount": 1000000
+    },
+    {
+      "type": "CANCEL",
+      "subject": "Country",
+      "object": "Agreement",
+      "amount": 1000000
+    },
+    {
+      "type": "NEGOTIATE",
+      "subject": "Country",
+      "object": "Agreement",
+      "amount": 1000000
+    },
+    {
+      "type": "TAKE_PLACE",
+      "subject": "Event",
+      "object": "Location",
+      "amount": 1000000
+    }
+  ]
+}

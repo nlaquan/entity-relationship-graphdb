@@ -1,0 +1,23 @@
+{
+  "name": "dev-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "csvtojson": "^2.0.10",
+    "express": "^4.17.1",
+    "js-yaml": "^3.13.1",
+    "lodash": "^4.17.15",
+    "multer": "^1.4.2",
+    "neo4j-driver": "^1.7.5",
+    "remove-blank-lines": "^1.1.1"
+  },
+  "scripts": {
+    "start": "npx nodemon src/index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.1"
+  }
+}
