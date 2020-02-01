@@ -12,6 +12,7 @@ import MergeEntity from './MergeEntity';
 import NewsByTime from './NewsByTime';
 import Statistics from './Statistics';
 import Location from './Location';
+import RawQuery from './RawQuery';
 
 export {
   News,
@@ -27,5 +28,6 @@ export {
   MergeEntity,
   NewsByTime,
   Statistics,
-  Location
+  Location,
+  RawQuery
 }

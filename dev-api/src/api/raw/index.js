@@ -15,12 +15,11 @@ function RawAPI(service) {
   API.call(this, service);
 
   async function rawQuery(req, res) {
-    const { id } = req.params;
-    const { long, lat } = req.query;
+    const { query } = req.body;
 
     try {
       withTryCatch({
-        promise: async () => await service.rawQuery({ id, lat, long }),
+        promise: async () => await service.executeRawQuery(query),
         onSuccess: (responsedData) => res.send(responsedData),
         onError: (err) => res.send(err)
       });

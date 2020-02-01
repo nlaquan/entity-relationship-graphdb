@@ -13,7 +13,8 @@ import {
   MergeEntity,
   NewsByTime,
   Statistics,
-  Location
+  Location,
+  RawQuery
 } from './Questions';
 import ListGroup from 'react-bootstrap/ListGroup';
 import CreateNews from './News';
@@ -66,6 +67,9 @@ const questions = [{
 }, {
   id: 'q15',
   content: 'Cập nhật thông tin về tạo độ của thực thể vị trí'
+}, {
+  id: 'q16',
+  content: 'Cho phép developer thực hiện câu truy vấn cypher'
 }];
 
 function getQuestion(questionId) {
@@ -90,7 +94,8 @@ const QUESTION_COMPONENTS = {
   q12: CreateNews,
   q13: NewsByTime,
   q14: Statistics,
-  q15: Location
+  q15: Location,
+  q16: RawQuery
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -236,6 +241,14 @@ const API_DES = {
     method: "PATCH",
     params: {
       id: 'ID của thực thể vị trí',
+    }
+  },
+  q16: {
+    description: "Thực hiện câu truy vấn cypher",
+    endpoint: '/raw-query',
+    method: "POST",
+    params: {
+      query: "Câu query cypher"
     }
   }
 }

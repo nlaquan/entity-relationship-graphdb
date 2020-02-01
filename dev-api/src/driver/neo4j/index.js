@@ -3,7 +3,9 @@ const neo4j = require('neo4j-driver').default;
 const newsApi = require('./lib/news');
 const entityApi = require('./lib/entity');
 const locationApi = require('./lib/location');
-const apis = { ...newsApi, ...entityApi, ...locationApi };
+const rawQuery = require('./lib/raw');
+
+const apis = { ...newsApi, ...entityApi, ...locationApi, ...rawQuery  };
 
 /**
  *

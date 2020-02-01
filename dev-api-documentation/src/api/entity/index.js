@@ -115,6 +115,12 @@ async function updateLocation({ id, lat, long }) {
     .then(res => res.data);
 }
 
+async function executeRawQuery(query) {
+  const url = 'raw-query';
+
+  return api.post(url, { query }).then(res => res.data);
+}
+
 export {
   entity,
   entityWithType,
@@ -126,5 +132,6 @@ export {
   entityWithRelationshipByQuarter,
   mergeEntity,
   statism,
-  updateLocation
+  updateLocation,
+  executeRawQuery
 }
