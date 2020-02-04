@@ -12,7 +12,7 @@ This project implement api service for entity relationship graphdb
 This project use [Nodejs](https://nodejs.org/en) for building service.
 
 ## Setup
-In order to run this project, run the following these command
+In order to run this project, run the following commands:
 ```
 yarn install
 yarn start

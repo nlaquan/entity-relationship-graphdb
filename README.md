@@ -26,4 +26,4 @@ This project allow developer generate simulation data
 ## Dev api documentation
 
 ## Docker
-This project contains guide and images for deploy entire project with docker.
+This project contains guide and images for deploy each project with docker.

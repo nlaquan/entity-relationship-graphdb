@@ -12,7 +12,7 @@ This project provide api documentation for service built by dev-api project
 This project use [Reactjs](https://reactjs.org/) for building UI
 
 ## Setup
-In order to run this project, run the following these command
+In order to run this project, run the following commands:
 ```
 yarn install
 yarn start
@@ -28,7 +28,7 @@ docker build -t dev-api-docs .
 ```
 
 ### Run project
-After building image, excute the following command to run project
+After building image, excute the following command to run project:
 ```
 docker run -p 3000:3000 -d --name dev-api-docs dev-api-docs
 ```
