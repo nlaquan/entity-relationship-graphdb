@@ -276,7 +276,7 @@ const entityWithRelationshipByQuarter = driver => ({
     where date.years = ${year} and date.months in [${QUARTERS[quarter]}]
     return distinct(s) as entity`;
 
-  console.log('query', queryString);
+  // console.log('query', queryString);
 
   return session.run(queryString)
     .then(result => {
@@ -290,7 +290,6 @@ const entityWithRelationshipByQuarter = driver => ({
 
 const statistic = driver => (ids) => {
   const session = driver.session();
-  console.log('ids', ids);
 
   const queryString =
     `unwind [ ${ids} ] as id
@@ -299,7 +298,7 @@ const statistic = driver => (ids) => {
 
   const keys = ['entity', 'frequency', 'news_frequency'];
 
-  console.log('query', queryString);
+  // console.log('query', queryString);
 
   return session.run(queryString)
     .then(result => {

@@ -4,8 +4,6 @@ const multer = require('multer');
 const bodyParser = require('body-parser');
 const upload = multer({ dest: 'uploads/' });
 const readNeo4jConfig = require('./neo4jConfig');
-const os = require('os');
-const networkInterfaces = os.networkInterfaces();
 
 app.use(cors());
 app.use(bodyParser.json());         // to support JSON-encoded bodies
@@ -85,8 +83,7 @@ app.post(`/${base}/news`,
   upload.single('file'), (req, res) => newsAPI.createNews(req, res)
 );
 
-const IP = networkInterfaces.en0[1].address;
-const server = app.listen(3001, console.log(`dev-api listen at ${IP}:3001`));
+const server = app.listen(3001, console.log(`dev-api listen at 3001`));
 
 process.on('SIGTERM', function () {
   server.close(function () {
