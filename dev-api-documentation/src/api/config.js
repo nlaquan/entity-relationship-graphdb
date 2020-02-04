@@ -1,11 +1,33 @@
 import axios from 'axios';
 
-const domain = 'http://192.168.25.104:3001';
-const baseURL = `${domain}/er-services`;
+function ConfigNotFound(message) {
+  this.message = message;
+  Error.captureStackTrace(this, ConfigNotFound);
+}
 
-const api = axios.create({
-  baseURL
-});
+ConfigNotFound.prototype = Object.create(Error.prototype);
+ConfigNotFound.prototype.name = 'ConfigNotFoundException';
+
+const isInvalid = str => str === undefined;
+
+const loadConfig = () => {
+  const apiAddress = process.env.REACT_APP_API_ADDRESS;
+
+  if (isInvalid(apiAddress)) {
+    throw new ConfigNotFound("API_ADDRESS not found!!!");
+  }
+
+  const domain = `http://${apiAddress}`;
+  const baseURL = `${domain}/er-services`;
+
+  const api = axios.create({
+    baseURL
+  });
+
+  return ({ api, domain, baseURL })
+};
+
+const { api, domain, baseURL } = loadConfig();
 
 export {
   api,
