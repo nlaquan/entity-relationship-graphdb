@@ -9,7 +9,7 @@
 This project
 
 ## Technologies
-This project use [Neo4j](#https://neo4j.com/) for graph database.
+This project use [Neo4j](https://neo4j.com/) for graph database.
 
 ## Setup
 This project include 4 sub project:
