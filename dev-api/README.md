@@ -1,4 +1,4 @@
-## api documentation
+## api service for entity relationship graphdb
 
 ## Table of contents
 * [General info](#general-info)
@@ -6,10 +6,10 @@
 * [Docker](#setup)
 
 ## General info
-This project provide api documentation for service built by dev-api project
+This project implement api service for entity relationship graphdb
 
 ## Technologies
-This project use [Reactjs](https://reactjs.org/) for building UI
+This project use [Nodejs](https://nodejs.org/en) for building service.
 
 ## Setup
 In order to run this project, run the following these command
@@ -24,13 +24,13 @@ This project can be used with docker.
 ### Build image
 In order to build image for this project, run the following command:
 ```
-docker build -t dev-api-docs .
+docker build -t dev-api .
 ```
 
 ### Run project
-After building image, excute the following command to run project
+After building image, excute the following command to run project:
 ```
-docker run -p 3000:3000 -d --name dev-api-docs dev-api-docs
+docker run -p 3001:3001 -d --name dev-api dev-api
 ```
 
 If you want to override environment variables at the runtime, you need do the followinng operations:<br>
