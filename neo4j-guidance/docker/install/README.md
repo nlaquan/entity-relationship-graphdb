@@ -1,0 +1,74 @@
+## Instructions for installing and running Neo4j database with docker
+This guidance is used for neo4j version 3.5
+
+## Table of contents
+* [Single Database](#single-database)
+* [Causual Cluster](#causual-cluster)
+
+## Single Database
+Retrieving and running Neo4j within a Docker container is very simple using one of the provided images. We will need to execute the basic **docker run** command with the neo4j image and specify any options or versions we want along with that. Let us take a look at a few options available with the **docker run** command.
+
+| Option | Description | Example |
+| --- | --- | --- |
+| --name | Name your container (avoids generic id) | `docker run --name myneo4j neo4j` |
+| -p | Specify container ports to expose | `docker run -p7687:7687 neo4j` |
+| -d | Detach container to run in background | `docker run -d neo4j` |
+| -v | Bind mount a volume | `docker run -v $HOME/neo4j/data:/data neo4j` |
+| --env | Set config as environment variables for Neo4j database | `docker run --env NEO4J_AUTH=neo4j/test` |
+| --help | Output full list of docker run options | `docker run --help` |
+
+By default, Neo4j requires authentication and requires us to first login with `neo4j/neo4j` and set a new password. We will skip this password reset by initializing the password when we create the Docker container using the `--env NEO4J_AUTH=neo4j/<password>` option.<br>
+For example, run the following command:
+```
+docker run \
+    --name testneo4j \
+    -p7474:7474 -p7687:7687 \
+    -d \
+    -v $HOME/neo4j/data:/data \
+    -v $HOME/neo4j/logs:/logs \
+    -v $HOME/neo4j/import:/var/lib/neo4j/import \
+    -v $HOME/neo4j/plugins:/plugins \
+    --env NEO4J_AUTH=neo4j/test \
+    neo4j:latest
+```
+With the above command:
+* Create and start a container named `testneo4j`
+* We have `-d`. This detaches the container to run in the background, meaning we can access the container separately and see into all of its processes.
+* With the `-v` option. These lines define volumes we want to bind in our local directory structure so we can access certain files locally. (For more information about Docker **bind mount**, visit docker [docs](https://docs.docker.com/storage/bind-mounts/)).
+  - The first one is for our /data directory, which stores the authentication and roles for each database, as well as the actual data contents of each database instance (in graph.db folder).
+  - The second -v option is for the /logs directory. Outputting the Neo4j logs to a place outside the container ensures we can troubleshoot any errors in Neo4j, even if the container crashes.
+  - The third line with the -v option binds the import directory, so we can copy CSV or other flat files into that directory for importing into Neo4j. Load scripts for importing that data can also be placed in this folder for us to execute.
+  - The next -v option line sets up our plugins directory. If we want to include any custom extensions or add the Neo4j APOC or graph algorithms library, exposing this directory simplifies the process of copying the jars for Neo4j to access.
+* With the `--env` parameter, we initiate our Neo4j instance with a username and password. Neo4j automatically sets up basic authentication with the `neo4j` username as a foundation for security. Since it will initiate authentication and require a password change when first connecting, we can handle all of that in this parameter.
+* Finally, the last line of the command above references the Docker image we want to pull from DockerHub (`neo4j`), as well as any specified version (in this case, just the `latest` edition).
+
+When we run this command, it will create and start the container.<br>
+Once we execute the command above, Neo4j should be running in our Docker container! You can verify this by running `docker ps.`
+
+## Cluster
+The following example shows how to set up a cluster with three Core servers with Docker.<br>
+
+### Example
+In this example, we will configure three Core Servers named ***core01.example.com***, ***core02.example.com*** and ***core03.example.com***.<br>
+Run the following command for each server
+```
+docker run --name=$NAME --detach \
+  --network=host \
+  --env NEO4J_dbms_mode=CORE \
+  --env NEO4J_causal__clustering_expected__core__cluster__size=$EXPECTED_CORE_CLUSTER_SIZE \
+  --env NEO4J_causal__clustering_initial__discovery__members=$INITIAL_CORE_MEMBERS \
+  --env NEO4J_causal__clustering_discovery__advertised__address=$IP:5000 \
+  --env NEO4J_causal__clustering_transaction__advertised__address=$IP:6000 \
+  --env NEO4J_causal__clustering_raft__advertised__address=$IP:7000 \
+  --env NEO4J_dbms_connectors_default__advertised__address=$IP \
+  --env NEO4J_dbms_connector_bolt_advertised__address=$IP:7687 \
+  --env NEO4J_dbms_connector_http_advertised__address=$IP:7474 \
+  --env NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
+  neo4j:enterprise
+```
+In which:
+* `$NAME` is the name of server (for example, you will probably name the servers respectively: **core1**, **core2**, **core3**)
+* `$EXPECTED_CORE_CLUSTER_SIZE` is the the expected core cluster size
+* `$ADDRESS` is the IP address or domain of the each server: ***core01.example.com***, ***core02.example.com*** and ***core03.example.com***
+
+After the cluster has started, we can connect to any of the instances and run **:sysinfo** to check the status of the cluster. This will show information about each member of the cluster. We now have a Neo4j Causal Cluster of three instances running.
