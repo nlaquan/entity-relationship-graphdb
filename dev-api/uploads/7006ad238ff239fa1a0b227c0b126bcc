@@ -1,0 +1,45 @@
+{
+  "extractedDate": "2019-10-11",
+  "link": "https://link-to-news-5",
+  "entities": [
+    {
+      "_id": "0",
+      "identity": 13313570,
+      "label": "Person",
+      "name": "Obama",
+      "description": "Tổng thống Mỹ Obama"
+    },
+    {
+      "_id": "1",
+      "identity": 13313571,
+      "label": "Person",
+      "name": "Nguyễn Xuân Phúc",
+      "description": "Chủ tịch nước Việt Nam"
+    },
+    {
+      "_id": "2",
+      "label": "Person",
+      "name": "Tập Cận Bình",
+      "description": "Chủ tịch Trung Quốc"
+    },
+    {
+      "_id": "3",
+      "label": "Time",
+      "time": "2019-12-10"
+    }
+  ],
+  "rels": [
+    {
+      "relationship": "meet",
+      "subjectId": "1",
+      "objectId": "0",
+      "timeId": "3"
+    },
+    {
+      "relationship": "meet",
+      "subjectId": "1",
+      "objectId": "2",
+      "timeId": "3"
+    }
+  ]
+}

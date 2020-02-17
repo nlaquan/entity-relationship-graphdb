@@ -1,5 +1,5 @@
 const random = require('random');
-const { capitalize } = require('lodash');
+const { capitalize, lowerCase } = require('lodash');
 const {
   writeToCSV, rdEntity, writeToCSVWithoutHeader
 } = require('../utils/misc');
@@ -79,6 +79,37 @@ async function saveEntity(label, nth, start, end) {
     'name': `${capitalLabel} ${start + i}`,
     'description': `This is ${label} ${start + i}`,
     ':LABEL': `${capitalLabel}`
+  }))
+
+  await writeToCSVWithoutHeader(displayName, dataArr, path);
+}
+
+async function saveName(label, nth, start, end) {
+  path = `import/entities/name/${lowerCase(label)}-hasName-part${nth}.csv`;
+  displayName = `${label}_part_${nth + 1}`;
+  const capitalLabel = capitalize(label);
+  const numberOfEntities = end - start;
+
+  dataArr = Array.from(new Array(numberOfEntities), (_, i) => ({
+    ['NameId:ID(Name-ID)']: `${capitalLabel}-${start + i}`,
+    'value': `${capitalLabel} ${start + i}`,
+    ':LABEL': `Name`
+  }))
+
+  await writeToCSVWithoutHeader(displayName, dataArr, path);
+}
+
+async function saveHasName(label, nth, start, end) {
+  path = `import/rels/hasName/${lowerCase(label)}/hasName-part${nth}.csv`;
+  displayName = `hasName_part_${nth + 1}`;
+  const capitalLabel = capitalize(label);
+  const numberOfEntities = end - start;
+  console.log('captital', capitalLabel);
+
+  dataArr = Array.from(new Array(numberOfEntities), (_, i) => ({
+    [`:START_ID(${capitalLabel}-ID)`]: start + i,
+    [`:END_ID(Name-ID)`]: `${capitalLabel}-${start + i}`,
+    ':TYPE': 'HAS_NAME'
   }))
 
   await writeToCSVWithoutHeader(displayName, dataArr, path);
@@ -224,4 +255,6 @@ module.exports = {
   createVisitFact,
   saveEntity,
   saveNews,
+  saveName,
+  saveHasName
 }

@@ -75,7 +75,7 @@ app.get(`/${base}/entity_with_relationship_by_quarter`,
   (req, res) => entityAPI.entityWithRelationshipByQuarter(req, res)
 )
 
-app.get(`/${base}/merge`,
+app.post(`/${base}/merge`,
   (req, res) => entityAPI.mergeEntity(req, res)
 )
 

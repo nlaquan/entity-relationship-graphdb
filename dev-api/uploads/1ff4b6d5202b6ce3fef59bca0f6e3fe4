@@ -1,0 +1,30 @@
+{
+  "extractedDate": "2019-10-11",
+  "link": "https://link-to-news-1",
+  "entities": [{
+    "_id": "0",
+    "label": "Person",
+    "name": "Obama",
+    "description": "Tổng thống Mỹ Obama"
+  }, {
+    "_id": "1",
+    "label": "Person",
+    "name": "Nguyễn Xuân Phúc",
+    "description": "Chủ tịch nước Việt Nam"
+  }, {
+    "_id": "2",
+    "label": "Time",
+    "time": "2019-10-10"
+  }],
+  "rels": [{
+    "relationship": "meet",
+    "subjectId": "0",
+    "objectId": "1",
+    "timeId": "2"
+  }, {
+    "relationship": "meet",
+    "subjectId": "1",
+    "objectId": "0",
+    "timeId": "2"
+  }]
+}

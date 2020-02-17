@@ -6,16 +6,17 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ReactJson from 'react-json-view';
 import { EndpointTable } from '../component';
-
+import { ENTITY_LABEL } from '../config';
 
 const DEFAULT_STATE = {
   ids: '',
+  label: ENTITY_LABEL[0],
   result: {}
 };
 
 function News({ question, apiDes }) {
   const [state, setState] = useState(DEFAULT_STATE);
-  const { ids, result } = state;
+  const { ids, result, label } = state;
 
   const onChange = (event) => {
     const { name, value } = event.target;
@@ -25,7 +26,8 @@ function News({ question, apiDes }) {
   const onSubmit = (event) => {
     event.preventDefault();
     const _ids = ids.split(',').map(id => id.trim()).filter(id => id !== "");
-    mergeEntity(_ids)
+
+    mergeEntity({ label, ids: _ids })
       .then(res => setState(state => ({ ...state, result: res })))
       .catch((err) => {
         console.log('err');
@@ -40,7 +42,8 @@ function News({ question, apiDes }) {
         </div>
         <b>Mô tả</b>
         <div>
-          Service tích hợp thực thể, nhận đầu vào là <b>ids</b> - danh sách ID của các thực thể cần
+          Service tích hợp thực thể, nhận đầu vào là <b>label</b> - nhãn của các thực thể
+          cần tích hợp và <b>ids</b> - danh sách ID của các thực thể cần
           được tích hợp.
         </div>
         <hr />
@@ -54,6 +57,18 @@ function News({ question, apiDes }) {
       <div className="col-md-7">
         <h3>Demo</h3>
         <Form onSubmit={onSubmit}>
+          <Form.Group as={Row}>
+            <Form.Label column sm="3">Nhãn</Form.Label>
+            <Col sm="9">
+              <Form.Control as="select" name="label" value={label} onChange={onChange}>
+                {
+                  ENTITY_LABEL.map(l =>
+                    <option key={l} value={l}>{l}</option>
+                  )
+                }
+              </Form.Control>
+            </Col>
+          </Form.Group>
           <Form.Group as={Row}>
             <Form.Label column sm="3">Danh sách thực thể</Form.Label>
             <Col sm="9">

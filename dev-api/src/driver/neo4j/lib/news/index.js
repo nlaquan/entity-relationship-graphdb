@@ -127,7 +127,9 @@ const createNews = driver => async (jsonData) => {
     }
 
     return `${acc}
-      create (e${i}:${e.label} {name: '${e.name}', description: '${e.description}'})`
+      create (e${i}:${e.label} {name: '${e.name}', description: '${e.description}'})
+      merge (name${i}:Name {value: '${e.name}'})
+      create (e${i})-[:HAS_NAME]->(name${i})`
   }, '');
 
   const partialQueryStringForFact = rels.reduce((acc, _, i) =>

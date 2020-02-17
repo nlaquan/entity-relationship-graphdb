@@ -69,11 +69,11 @@ function EntityAPI(service) {
   }
 
   async function mergeEntity(req, res) {
-    // console.log('req.query', req.query);
-    const _ids = req.query.ids.split(',');
+    const { ids: idsString, label } = req.body;
+    const ids = idsString.split(',').map(e => parseInt(e, 10));
 
     try {
-      const responsedData = await service.mergeEntity(_ids);
+      const responsedData = await service.mergeEntity({ ids, label });
       res.send(responsedData);
     } catch (err) {
       console.log('err', err);
@@ -83,9 +83,6 @@ function EntityAPI(service) {
 
   async function entityWithRelationship(req, res) {
     const { id, relationship } = req.query;
-    // console.log('query', req.query);
-    // console.log('id', id);
-    // console.log('rel', relationship);
 
     try {
       const responsedData = await service.entityWithRelationship({ id, relationship });

@@ -1,9 +1,10 @@
 const {
   saveEntitiesUseChildProcess,
-  saveNewsUseChildProcess
+  saveNewsUseChildProcess,
+  saveEntitiesNameUseChildProcess
 } = require('./utils/process');
 const { rd, loadDates, rdEntity } = require('./utils/misc');
-const { THRESSHOLD, FACTS_PER_NEWS } = require('./config');
+const { THRESSHOLD, FACTS_PER_NEWS, LABEL_HAS_MANY_NAME } = require('./config');
 const { createScript } = require('./utils/script');
 const { readConfig, prepare, saveTime } = require('./utils/prepare');
 const { writeToCSVWithoutHeader } = require('./utils/misc');
@@ -45,6 +46,7 @@ const hierarchy = {
       const hasSubjects = [];
       const hasObjects = [];
       const hasTimes = [];
+      const hasNames = [];
 
       let sId = 0;
       let oId = 0;
@@ -134,7 +136,7 @@ const hierarchy = {
     entityFolderNames: [...Object.keys(entities), "news", "fact", "time"],
   }, {
     relRootFolder: `${hierarchy.root}/${hierarchy.subs[1]}`,
-    relFolderNames: [...Object.keys(relMap), "hasFact"]
+    relFolderNames: [...Object.keys(relMap)]
   });
 
   for (let i = 0; i < facts.length; ++i) {
@@ -144,10 +146,11 @@ const hierarchy = {
 
   createScript(
     [...Object.keys(entities), "news", "fact", "time"],
-    [...facts.map(rel => rel.type), "hasFact"]
+    [...facts.map(rel => rel.type), "hasFact", "hasName"]
   );
 
   saveEntitiesUseChildProcess({ ...entities });
+  saveEntitiesNameUseChildProcess({ ...entities });
   saveNewsUseChildProcess(currentNewsId + 1);
   await saveTime(dates);
 })();

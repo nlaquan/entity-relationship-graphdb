@@ -8,6 +8,7 @@ async function entity({ label, name, isExact }) {
 
   return api.get(url)
     .then(function (res) {
+      console.log('res', res);
       return res.data;
     })
 }
@@ -91,11 +92,10 @@ async function entityWithOtherEntityInNews({ links, id }) {
     })
 }
 
-async function mergeEntity(ids) {
-  const url =
-    `merge?ids=${ids.join(',')}`;
+async function mergeEntity({ ids, label }) {
+  const url = 'merge';
 
-  return api.get(url)
+  return api.post(url, { ids: ids.join(','), label })
     .then((res) => {
       return res.data;
     })

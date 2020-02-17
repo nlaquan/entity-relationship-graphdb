@@ -13,13 +13,18 @@ const {
   getInt
 } = require('../../utils');
 
+const { capitalize } = require('lodash');
+
 
 const entity = driver => async ({ label, name, isExact }) => {
   const session = driver.session();
+
   const queryString =
     isExact
-      ? `match (n:${label} {name: '${name}'}) return n`
-      : `match (n:${label}) where n.name contains '${name}' return n`;
+      ? `match (n:${label})-[:HAS_NAME]->(:Name {value: '${name}'}) return n`
+      : `match (n:${label})-[:HAS_NAME]->(name:Name) where name.value contains '${name}' return n`;
+
+  console.log('query', queryString);
 
   return session.run(queryString)
     .then(result => {
@@ -146,10 +151,9 @@ const entityHasRelWithOthersInNews = driver => async ({ links, id }) => {
     });
 }
 
-const mergeEntity = driver => async (ids) => {
-  console.log('merge');
+const mergeEntity = driver => async ({ ids, label }) => {
   const session = driver.session();
-  const queryString = mergeEntityQuery(ids);
+  const queryString = mergeEntityQuery({ ids, label });
 
   return session.run(queryString)
     .then(result => ({ response: true }))
@@ -159,25 +163,37 @@ const mergeEntity = driver => async (ids) => {
     });
 }
 
-const mergeEntityQuery = (ids) => {
-  let queryString = '';
-  for (let i = 0; i < ids.length; ++i) {
-    queryString +=
-      `\nmatch (p${i}) where ID(p${i}) = ${ids[i]}`
-      + `\nwith p${i}`;
-    for (let j = 0; j < i; ++j) {
-      queryString += `, p${j} `;
-    }
-  }
-  queryString += "\n";
-
-  for (let i = 0; i < ids.length - 1; ++i) {
-    queryString +=
-      `create (p${i})<-[:SAME_AS]-(p${i + 1})\n`;
-  }
-
+const mergeEntityQuery = ({ ids, label }) => {
+  let queryString =
+    `unwind [${ids.join(',')}] as id
+    with id
+    match (n:${capitalize(label)}) where ID(n) = id
+    with collect(n) as nodes
+    CALL apoc.refactor.mergeNodes(nodes,{properties:"combine", mergeRels:true}) yield node
+    return *;
+    `;
   return queryString;
 }
+
+// const mergeEntityQuery = (ids) => {
+//   let queryString = '';
+//   for (let i = 0; i < ids.length; ++i) {
+//     queryString +=
+//       `\nmatch (p${i}) where ID(p${i}) = ${ids[i]}`
+//       + `\nwith p${i}`;
+//     for (let j = 0; j < i; ++j) {
+//       queryString += `, p${j} `;
+//     }
+//   }
+//   queryString += "\n";
+
+//   for (let i = 0; i < ids.length - 1; ++i) {
+//     queryString +=
+//       `create (p${i})<-[:SAME_AS]-(p${i + 1})\n`;
+//   }
+
+//   return queryString;
+// }
 
 const entityWithRelationship = driver => ({ id, relationship }) => {
   const session = driver.session();

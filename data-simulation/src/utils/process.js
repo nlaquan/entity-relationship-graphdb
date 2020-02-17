@@ -69,7 +69,32 @@ async function saveEntitiesUseChildProcess(entities) {
   });
 }
 
+async function saveEntitiesNameUseChildProcess(entities) {
+  const _entitiesArr = Object.entries(entities).sort((e1, e2) => e1[1] - e2[1]);
+
+
+  const processArr = Array.from(new Array(_entitiesArr.length), (_, i) => {
+    return childProcess.spawn('node', [
+      'src/genData/saveNameProcess.js',
+      _entitiesArr[i][0],
+      i,
+      _entitiesArr[i][1]
+    ]);
+  });
+
+  processArr.forEach(process => {
+    process.stdout.on('data', function (data) {
+      console.log('finish');
+    });
+
+    process.stderr.on('data', function (data) {
+      console.log('stderr: ' + data);
+    });
+  });
+}
+
 module.exports = {
   saveNewsUseChildProcess,
-  saveEntitiesUseChildProcess
+  saveEntitiesUseChildProcess,
+  saveEntitiesNameUseChildProcess
 }
