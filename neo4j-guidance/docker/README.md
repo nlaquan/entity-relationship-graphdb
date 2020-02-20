@@ -1,11 +1,13 @@
-## Instructions for installing and running Neo4j database with docker
+## Instructions for working with Neo4j database with docker
 This guidance is used for neo4j version 3.5
 
 ## Table of contents
-* [Single Database](#single-database)
-* [Causual Cluster](#causual-cluster)
+* [Innstall](#install)
+* [Backup](#backup)
+* [Restore](#restore)
 
-## Single Database
+## Install
+### Single Database
 Retrieving and running Neo4j within a Docker container is very simple using one of the provided images. We will need to execute the basic **docker run** command with the neo4j image and specify any options or versions we want along with that. Let us take a look at a few options available with the **docker run** command.
 
 | Option | Description | Example |
@@ -45,10 +47,10 @@ With the above command:
 When we run this command, it will create and start the container.<br>
 Once we execute the command above, Neo4j should be running in our Docker container! You can verify this by running `docker ps.`
 
-## Cluster
+### Cluster
 The following example shows how to set up a cluster with three Core servers with Docker.<br>
 
-### Example
+#### Example
 In this example, we will configure three Core Servers named ***core01.example.com***, ***core02.example.com*** and ***core03.example.com***.<br>
 Run the following command for each server
 ```
@@ -72,3 +74,33 @@ In which:
 * `$ADDRESS` is the IP address or domain of the each server: ***core01.example.com***, ***core02.example.com*** and ***core03.example.com***
 
 After the cluster has started, we can connect to any of the instances and run **:sysinfo** to check the status of the cluster. This will show information about each member of the cluster. We now have a Neo4j Causal Cluster of three instances running.
+
+## Backup
+In order to back up Neo4j database, follow these steps:
+1. Create volume named 'neo4j-backups' in docker by using the following command:
+```
+docker volume create neo4j-backups
+```
+2. Open terminal, execute the following command:
+```
+docker run -d \
+  --volume neo4j-backups:/data \
+  --env NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
+  neo4j:enterprise /bin/bash -c "neo4j-admin backup --from=$IP \
+    --backup-dir=/data --name=$NAME"
+```
+with `$IP` is the IP/domain of backup server, `$NAME` is the name of folder containning backup data
+
+## Restore
+**Requirement**: `neo4j-backups` volume must be created in advance<br>
+Open terminal, execute the following command:
+```
+docker run -d \
+  -p7474:7474 -p7687:7687 \
+  --volume neo4j-backups:/backups:ro \
+  -it \
+  neo4j:enterprise /bin/bash -c "/var/lib/neo4j/bin/neo4j-admin restore \
+  --from=/backups/ --database=$NAME --force; \
+  neo4j console"
+```
+with `$NAME` is the name of folder containning backup data

@@ -1,11 +1,13 @@
-## Instructions for installing and running Neo4j database
+## Instructions for working with Neo4j database
 This guidance is used for neo4j version 3.5
 
 ## Table of contents
-* [Single Database](#single-database)
-* [Casual Cluster](#causual-cluster)
+* [Install](#install)
+* [Backup](#backup)
+* [Restore](#restore)
 
-## Single Database
+## Install
+### Single Database
 First you need to download the tar file of Neo4j from [here](https://neo4j.com/download-center/#community),
 this is the community edition which is free of cost there is one more edition enterprise edition
 that is not free. The website will provide you the required version for your operating system
@@ -28,9 +30,9 @@ Go to neo4j folder, for example
 Now to run the neo4j run the below command:
 ```./bin/neo4j start```
 
-## Casual Cluster
+### Casual Cluster
 
-### Configuration
+#### Configuration
 | Option | Description |
 | --- | --- |
 | dbms.default_listen_address | The address or network interface this machine uses to listen for incoming messages. Setting this value to **0.0.0.0** makes Neo4j bind to all available network interfaces. |
@@ -79,7 +81,7 @@ the status of the cluster. This will show information about each member of the c
 
 We now have a Neo4j Causal Cluster of three instances running.
 
-### Add a Core Server to an existing cluster
+#### Add a Core Server to an existing cluster
 Core Servers are added to an existing cluster by starting a new Neo4j instance with
 the appropriate configuration.<br>
 
@@ -97,7 +99,7 @@ causal_clustering.minimum_core_cluster_size_at_runtime=3
 causal_clustering.discovery_members=core01.example.com:5000,core02.example.com:5000,core03.example.com:5000,core04.example.com:5000
 ```
 Now we can start the new Core Server and let it add itself to the existing cluster.
-### Add a Read Replica to an existing cluster
+#### Add a Read Replica to an existing cluster
 In this example, we will add a Read Replica, *replica01.example.com*, to the cluster that we created in [Configuration](#configuration). We configure the following entries in **neo4j.conf**.<br>
 **neo4j.conf on replica01.example.com**
 ```
@@ -105,3 +107,106 @@ dbms.mode=READ_REPLICA
 causal_clustering.discovery_members=core01.example.com:5000,core02.example.com:5000,core03.example.com:5000
 ```
 Now we can start the new Read Replica and let it add itself to the existing cluster.
+
+## Backup
+### Configuration parameters
+The table below lists the configuration parameters relevant to backup. These parameters are configured in the **neo4j.conf** file.<br>
+
+| Parameter name | Default value | Description |
+| --- | --- | --- |
+| dbms.backup.enabled | true | Enable support for running online backups. |
+| dbms.backup.address | 127.0.0.1:6362-6372 | Listening server for online backups. |
+
+### Backup online process
+Backup online process follow these steps:<br>
+1. Backup server need to be configured with parameters shown in the above table.
+2. From another computer - called backup client. Open terminal and move the neo4j folder, execute *neo4j-admin backup* command. The data to be backed up will be stored on the backup client.
+
+### Backup online command
+Syntax
+```
+neo4j-admin backup --backup-dir=<backup-path> --name=<graph.db-backup>
+                    [--from=<address>] [--protocol=<any|catchup|common>]
+                    [--fallback-to-full[=<true|false>]]
+                    [--pagecache=<pagecache>]
+                    [--timeout=<timeout>]
+                    [--check-consistency[=<true|false>]]
+                    [--additional-config=<config-file-path>]
+                    [--cc-graph[=<true|false>]]
+                    [--cc-indexes[=<true|false>]]
+                    [--cc-label-scan-store[=<true|false>]]
+                    [--cc-property-owners[=<true|false>]]
+                    [--cc-report-dir=<directory>]
+```
+Options<br>
+
+| Option | Default | Description |
+| --- | --- | --- |
+| protocol | any | Protocol over which to perform backup. If set to **any**, then **catchup** will be tried first. If that fails, then it will attempt to fall back to **common**. It is recommended to set this option explicitly. Set it to **catchup** for Causal Cluster backups, and to **common** for HA or single-instance backups. |
+| backup-dir | | Directory to place backup in. |
+| name | | Name of backup. |
+| from | localhost:6362 | Host and port of backup server |
+
+For other parameters please refer to the neo4j [docs](https://neo4j.com/docs/operations-manual/3.5/backup/performing/)
+
+### Example
+Assuming backup server is configured with the following parameters:
+```
+dbms.backup.enabled=true
+dbms.backup.address=backup-server@example.com
+```
+On the backup client, go to neo4j folder and run the following command:
+```
+neo4j-admin backup
+  --protocol=any
+  --from=backup-server@example.com
+  --backup-dir=03/02/2020
+  --name=graph.db-graph
+```
+
+## Restore
+### Restore command
+A Neo4j database can be restored using the restore command of **neo4j-admin**.
+
+Syntax
+```
+neo4j-admin restore --from=<backup-directory> [--database=<name>] [--force[=<true|false>]]
+```
+Options
+
+| Option | Default | Description
+| --- | --- | --- |
+| --from | | Path to backup to restore from |
+| --database | neo4j | Name of database |
+| --force | | If an existing database should be replaced|
+
+### Restore a standalone server (single database)
+To restore from backups, follow these steps:
+1. If the server is running, shut it down.
+2. Run **neo4j-admin** restore for every database.
+3. Start up the server.
+
+**Example**: Restore the databases system and neo4j from the backups located in **/backup/2019_12_10/graph.db-backup**. Note that the server must be shut down.<br>
+First of all, move to neo4j folder. Then, run the following commands
+```
+./bin/neo4j stop
+./bin/neo4j-admin restore --from=/backup/2019_12_10/graph.db-backup --database=neo4j --force
+./bin/neo4j start
+```
+
+### Restore a cluster
+In order to restore in a Causal Cluster, servers in Core Server need to be unbound from the cluster using **neo4j-admin unbind** command.<br>
+Unbind command syntax
+```
+neo4j-admin restore --from=<backup-directory> [--database=<name>] [--force[=<true|false>]]
+```
+For example, in order to unbind for 1 server in Core Server whose database name is **graph.db**, run the following command
+```
+neo4j-admin unbind --database=graph.db
+```
+To restore from a backup in a Causal Cluster, follow these steps:
+1. Shut down all database instances in the cluster.
+2. Run the **neo4j-admin unbind** command on each of the Core Servers.
+3. Restore the backup on each instance, using **neo4j-admin restore**.
+4. Start the database instances.
+
