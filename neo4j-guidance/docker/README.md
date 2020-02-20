@@ -12,7 +12,7 @@ Retrieving and running Neo4j within a Docker container is very simple using one 
 
 | Option | Description | Example |
 | --- | --- | --- |
-| --name | Name your container (avoids generic id) | `docker run --name myneo4j neo4j` |
+| --name | Name your container (avoids generic id) | `docker run --name name-of-container-what-you-want neo4j` |
 | -p | Specify container ports to expose | `docker run -p7687:7687 neo4j` |
 | -d | Detach container to run in background | `docker run -d neo4j` |
 | -v | Bind mount a volume | `docker run -v $HOME/neo4j/data:/data neo4j` |
@@ -51,25 +51,25 @@ Once we execute the command above, Neo4j should be running in our Docker contain
 The following example shows how to set up a cluster with three Core servers with Docker.<br>
 
 #### Example
-In this example, we will configure three Core Servers named ***core01.example.com***, ***core02.example.com*** and ***core03.example.com***.<br>
+In this example, we will configure three Core Servers with the respective domain are ***core01.example.com***, ***core02.example.com*** and ***core03.example.com***.<br>
 Run the following command for each server
 ```
-docker run --name=$NAME --detach \
+docker run --name=$NAME_OF_CONTAINER --detach \
   --network=host \
   --env NEO4J_dbms_mode=CORE \
   --env NEO4J_causal__clustering_expected__core__cluster__size=$EXPECTED_CORE_CLUSTER_SIZE \
   --env NEO4J_causal__clustering_initial__discovery__members=$INITIAL_CORE_MEMBERS \
-  --env NEO4J_causal__clustering_discovery__advertised__address=$IP:5000 \
-  --env NEO4J_causal__clustering_transaction__advertised__address=$IP:6000 \
-  --env NEO4J_causal__clustering_raft__advertised__address=$IP:7000 \
-  --env NEO4J_dbms_connectors_default__advertised__address=$IP \
-  --env NEO4J_dbms_connector_bolt_advertised__address=$IP:7687 \
-  --env NEO4J_dbms_connector_http_advertised__address=$IP:7474 \
+  --env NEO4J_causal__clustering_discovery__advertised__address=$ADDRESS:5000 \
+  --env NEO4J_causal__clustering_transaction__advertised__address=$ADDRESS:6000 \
+  --env NEO4J_causal__clustering_raft__advertised__address=$ADDRESS:7000 \
+  --env NEO4J_dbms_connectors_default__advertised__address=$ADDRESS \
+  --env NEO4J_dbms_connector_bolt_advertised__address=$ADDRESS:7687 \
+  --env NEO4J_dbms_connector_http_advertised__address=$ADDRESS:7474 \
   --env NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
   neo4j:enterprise
 ```
 In which:
-* `$NAME` is the name of server (for example, you will probably name the servers respectively: **core1**, **core2**, **core3**)
+* `$NAME_OF_CONTAINER` is the name of container (for example, you will probably name the servers respectively: **neo4j-core1**, **neo4j-core2**, **neo4j-core3**)
 * `$EXPECTED_CORE_CLUSTER_SIZE` is the the expected core cluster size
 * `$ADDRESS` is the IP address or domain of the each server: ***core01.example.com***, ***core02.example.com*** and ***core03.example.com***
 
@@ -77,30 +77,58 @@ After the cluster has started, we can connect to any of the instances and run **
 
 ## Backup
 In order to back up Neo4j database, follow these steps:
-1. Create volume named 'neo4j-backups' in docker by using the following command:
+1. Create volume named `neo4j-backups` in docker by using the following command:
 ```
 docker volume create neo4j-backups
 ```
 2. Open terminal, execute the following command:
 ```
-docker run -d \
-  --volume neo4j-backups:/data \
+docker run neo4j_backup -d \
+  --v neo4j-backups:/data \
+  --v $HOME/neo4j/logs:/logs \
+  --v $HOME/neo4j/import:/var/lib/neo4j/import \
+  --v $HOME/neo4j/plugins:/plugins \
+  --env NEO4J_AUTH=neo4j/test \
   --env NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
-  neo4j:enterprise /bin/bash -c "neo4j-admin backup --from=$IP \
+  neo4j:enterprise /bin/bash -c "neo4j-admin backup --from=$ADDRESS \
     --backup-dir=/data --name=$NAME"
 ```
-with `$IP` is the IP/domain of backup server, `$NAME` is the name of folder containning backup data
-
+in which `$ADDRESS` is the IP/domain of backup server, `$NAME` is the name of backup data.<br>
+With the above command:
+* Create and start a container named `neo4j_backup`
+* With the `-v` option. These lines define volumes we want to mount (bind mount/volume) in our local directory structure so we can access certain files locally. (For more information about Docker **bind mount**, visit docker [docs](https://docs.docker.com/storage/bind-mounts/); **volume** visit docker [docs](https://docs.docker.com/storage/volumes/)).
+  - The first one is for our /data directory.
+  - The second -v option is for the /logs directory. Outputting the Neo4j logs to a place outside the container ensures we can troubleshoot any errors in Neo4j, even if the container crashes.
+  - The third line with the -v option binds the import directory, so we can copy CSV or other flat files into that directory for importing into Neo4j. Load scripts for importing that data can also be placed in this folder for us to execute.
+  - The next -v option line sets up our plugins directory. If we want to include any custom extensions or add the Neo4j APOC or graph algorithms library, exposing this directory simplifies the process of copying the jars for Neo4j to access.
+* With the `--env` parameter, we initiate our Neo4j instance with a username and password. Neo4j automatically sets up basic authentication with the `neo4j` username as a foundation for security. Since it will initiate authentication and require a password change when first connecting, we can handle all of that in this parameter.
+* Finally, the last line of the command above references the Docker image we want to pull from DockerHub (`neo4j`), as well as any specified version (in this case, just the `enterprise` edition) and the command will be executed when the container running: *bin/bash -c "neo4j-admin backup --from=$ADDRESS \
+    --backup-dir=/data --name=$NAME* - this command will make data backup.
 ## Restore
 **Requirement**: `neo4j-backups` volume must be created in advance<br>
 Open terminal, execute the following command:
 ```
-docker run -d \
+docker run --name neo4j -d \
   -p7474:7474 -p7687:7687 \
   --volume neo4j-backups:/backups:ro \
-  -it \
+  --volume $HOME/neo4j/data:/data \
+  --volume $HOME/neo4j/logs:/logs \
+  --volume $HOME/neo4j/import:/var/lib/neo4j/import \
+  --volume $HOME/neo4j/plugins:/plugins \
+  --env NEO4J_AUTH=neo4j/test \
   neo4j:enterprise /bin/bash -c "/var/lib/neo4j/bin/neo4j-admin restore \
   --from=/backups/ --database=$NAME --force; \
   neo4j console"
 ```
-with `$NAME` is the name of folder containning backup data
+in which `$NAME` is the name of backup data<br>
+With the above command:
+* Create and start a container named `neo4j`
+* With the `-v` option. These lines define volumes we want to mount (bind mount/volume) in our local directory structure so we can access certain files locally. (For more information about Docker **bind mount**, visit docker [docs](https://docs.docker.com/storage/bind-mounts/); **volume** visit docker [docs](https://docs.docker.com/storage/volumes/)).
+  - The first one is for mounting `neo4j-backups` volume (which has backup data) to `backups` folder in container (`:ro` at the end of this line mean container can't writing data to `backups` folder)
+  - The second -v option is for the /logs directory. Outputting the Neo4j logs to a place outside the container ensures we can troubleshoot any errors in Neo4j, even if the container crashes.
+  - The third line with the -v option binds the import directory, so we can copy CSV or other flat files into that directory for importing into Neo4j. Load scripts for importing that data can also be placed in this folder for us to execute.
+  - The next -v option line sets up our plugins directory. If we want to include any custom extensions or add the Neo4j APOC or graph algorithms library, exposing this directory simplifies the process of copying the jars for Neo4j to access.
+* With the `--env` parameter, we initiate our Neo4j instance with a username and password. Neo4j automatically sets up basic authentication with the `neo4j` username as a foundation for security. Since it will initiate authentication and require a password change when first connecting, we can handle all of that in this parameter.
+* Finally, the last line of the command above references the Docker image we want to pull from DockerHub (`neo4j`), as well as any specified version (in this case, just the `enterprise` edition) and the command will be executed when the container running: */bin/bash -c "/var/lib/neo4j/bin/neo4j-admin restore \
+  --from=/backups/ --database=$NAME --force; \
+  neo4j console* - this command will perform data recovery.

@@ -43,7 +43,7 @@ Now to run the neo4j run the below command:
 | causal_clustering.initial_discovery_members | The network addresses of an initial set of Core cluster members that are available to bootstrap this Core or Read Replica instance. In the default case, the initial discovery members are given as a comma-separated list of address/port pairs, and the default port for the discovery service is :5000 |
 
 The following example shows how to set up a simple cluster with three Core servers.<br>
-In this example, we will configure three Core Servers named ***core01.example.com***, ***core02.example.com*** and ***core03.example.com***. We have already installed Neo4j Enterprise Edition on all three servers. We configure them by preparing **neo4j.conf** on each server. Note that they are all identical, except for the configuration of ***dbms.default_advertised_address***.
+In this example, we will configure three Core Servers with the respective domain are ***core01.example.com***, ***core02.example.com*** and ***core03.example.com***. We have already installed Neo4j Enterprise Edition on all three servers. We configure them by edit **neo4j.conf** file on each server. Note that they are all identical, except for the configuration of ***dbms.default_advertised_address***.
 
 **neo4j.conf on core01.example.com:**
 ```
@@ -100,7 +100,7 @@ causal_clustering.discovery_members=core01.example.com:5000,core02.example.com:5
 ```
 Now we can start the new Core Server and let it add itself to the existing cluster.
 #### Add a Read Replica to an existing cluster
-In this example, we will add a Read Replica, *replica01.example.com*, to the cluster that we created in [Configuration](#configuration). We configure the following entries in **neo4j.conf**.<br>
+In this example, we will add a Read Replica with domain: *replica01.example.com*, to the cluster that we created in [Configuration](#configuration). We configure the following entries in **neo4j.conf**.<br>
 **neo4j.conf on replica01.example.com**
 ```
 dbms.mode=READ_REPLICA
@@ -109,7 +109,16 @@ causal_clustering.discovery_members=core01.example.com:5000,core02.example.com:5
 Now we can start the new Read Replica and let it add itself to the existing cluster.
 
 ## Backup
-### Configuration parameters
+Online backups are typically required for production environments, but it is also possible to perform offline backups.<br>
+Offline backups are a more limited method for backing up a database. For example:<br>
+Online backups run against a live Neo4j instance, while offline backups require that the database is shut down.
+Online backups can be full or incremental, but there is no support for backing up incrementally with offline backups.
+For more details about offline backups, see [Dump and load databases](#https://neo4j.com/docs/operations-manual/3.5/tools/dump-load/)
+
+The remainder of this chapter is dedicated to describing online backups.
+### Standalone databases
+
+#### Configuration parameters
 The table below lists the configuration parameters relevant to backup. These parameters are configured in the **neo4j.conf** file.<br>
 
 | Parameter name | Default value | Description |
@@ -163,6 +172,20 @@ neo4j-admin backup
   --backup-dir=03/02/2020
   --name=graph.db-graph
 ```
+
+### Causal Clusters Backup
+#### Configuration parameters
+The table below lists the configuration parameters relevant to backup. These parameters are configured in the **neo4j.conf** file.<br>
+
+| Parameter name | Default value | Description |
+| --- | --- | --- |
+| dbms.backup.enabled | true | Enable support for running online backups. |
+| dbms.backup.address | 127.0.0.1:6362-6372 | Listening server for online backups. |
+| dbms.backup.backup_policy |  | The SSL policy used on the backup port. |
+
+#### Encrypted backups
+Encrypted backups are available with Causal Clustering.<br>
+Both the server running the backup, and the backup target, must be configured with the same SSL policy. The policy to be used for encrypting backup traffic must be assigned on both servers. (see Section 5.4, “Intra-cluster encryption”)
 
 ## Restore
 ### Restore command
