@@ -1,0 +1,215 @@
+## Hướng dẫn thao tác với Neo4j database
+Hướng dẫn này được viết cho Neo4j phiên bản 3.5
+
+## Nội dung
+* [Cài đặt](#cài-đặt)
+* [Sao lưu](#sao-lưu)
+* [Khôi phục](#khôi-phục)
+
+## Cài đặt
+### Single Database
+Trước hết, bạn cần tải về file tar của Neo4j từ [đây](https://neo4j.com/download-center/#community), đây là phiên bản miễn phí - comminity. Ngoài ra còn có một phiên bản trả phí (enterprise). Chọn phiên bạn Neo4j phù hợp với hệ thống của bạn và bấm nút Download. Sau khi tải về file cài đặt về, thực hiện lần lượt các bước dưới đây.
+
+* **Bước 1**: <br>
+Sao chép file đã tải về tới thư mục bạn muốn cài Neo4j, bật terminal lên, di chuyển đến thư mục cài đặt Neo4j bằng lệnh sau
+```cd /path/to/folder-that-you-want-to-install-neo4j```
+
+```
+tar -xf Downloaded file name
+like: $ tar -xf neo4j-enterprise-3.5.8-unix.tar.gz
+```
+
+* **Bước 2**: <br>
+Di chuyển đến thư mục bạn đã giải nén Neo4j, ví dụ:
+```cd neo4j-enterprise-3.5.8```.<br>
+Lúc này chạy câu lệnh sau để khởi chạy Neo4j:
+```./bin/neo4j start```
+
+### Casual Cluster
+
+#### Tham số cấu hình
+| Tham số | Mô tả |
+| --- | --- |
+| dbms.default_listen_address | Địa chỉ hoặc giao diện mạng mà máy sử dụng để lắng nghe request tới. Đặt giá trị này là **0.0.0.0** để gắn tới bất kì giao diện mạng nào có sẵn |
+| dbms.default_advertised_address | Địa chỉ để các máy khác thực hiện kết nối tới. Thông thường, đây là địa chỉ IP hoặc domain |
+| dbms.mode | Chế độ của một single server instance. Trong chế độ Cluser, tham số này có 2 giá trị là: CORE hoặc READ_REPLICA |
+| causal_clustering.minimum_core_cluster_size_at_formation | Số lượng máy nhỏ nhất trong cụm tại thời điểm thực hiện khởi tạo cluser. Một cluser sẽ không thể khởi tạo thành công nếu không xác định tham số này. Giá trị mặc định là **3** và giá trị nhỏ nhất có thể đặt là **2** |
+| causal_clustering.minimum_core_cluster_size_at_runtime | Số lượng core instance sẽ tồn tại trong cụm tại thời điểm runtime |
+| causal_clustering.initial_discovery_members | Danh sách địa chỉ IP/doamin của các máy để khởi tạo nên Cluser, thường được phân tách với nhau bởi sau phảy và cổng mặc dịnh là :5000 |
+
+Ví dụ dưới đây minh hoạ việc cài đặt một cụm với 3 máy Core. Trong ví dụ này, 3 máy core lần lượt có domain tương ứng là: ***core01.example.com***, ***core02.example.com*** và ***core03.example.com***. Neo4j Enterprise Edition đã được cài đặt trên cả 3 máy. Các cấu hình được chỉnh sửa trong file **neo4j.conf** mà Neo4j đã cung cấp.
+
+Trong file **neo4j.conf** trên máy có **domain core01.example.com**:
+```
+dbms.connectors.default_listen_address=0.0.0.0
+dbms.connectors.default_advertised_address=core01.example.com
+dbms.mode=CORE
+causal_clustering.minimum_core_cluster_size_at_formation=3
+causal_clustering.minimum_core_cluster_size_at_runtime=3
+causal_clustering.initial_discovery_members=core01.example.com:5000,core 02.example.com:5000,core03.example.com:5000
+```
+
+Trong file **neo4j.conf** trên máy có domain **core02.example.com**:
+```
+dbms.connectors.default_listen_address=0.0.0.0
+dbms.connectors.default_advertised_address=core02.example.com
+dbms.mode=CORE
+causal_clustering.minimum_core_cluster_size_at_formation=3
+causal_clustering.minimum_core_cluster_size_at_runtime=3
+causal_clustering.initial_discovery_members=core01.example.com:5000,core 02.example.com:5000,core03.example.com:5000
+```
+
+Trong file **neo4j.conf** trên máy có domain **core03.example.com**:
+```
+dbms.connectors.default_listen_address=0.0.0.0
+dbms.connectors.default_advertised_address=core03.example.com
+dbms.mode=CORE
+causal_clustering.minimum_core_cluster_size_at_formation=3
+causal_clustering.minimum_core_cluster_size_at_runtime=3
+causal_clustering.initial_discovery_members=core01.example.com:5000,core 02.example.com:5000,core03.example.com:5000
+```
+Lúc này, các máy cần được khởi chạy để tạo nên Cluser. Thứ tự khởi chạy các máy là không quan trọng.<br>
+Sau khi cluster khởi chạy thành công, chạy câu lệnh `sysinfo` trên [neo4j browser](http://localhost:7474) để kiểm tra trạng thái của cluser.
+
+#### Thêm một core và cụm đã tồn tại
+Core server được thêm vào cụm đã tồn tại bằng cách khởi chạy một Neo4j instance mới với các tham số cấu hình thích hợp.<br>
+Tham số *causal_clustering.initial_discovery_members* phải được cập nhật trên tất cả các máy trong cụm. <br>
+Trong ví dụ dưới đây, một core server với domain *core04.example.com* sẽ được thêm vào cụm mà đã được tạo trong chương [Configuration](#configuration).<br>
+Trong file **neo4j.conf** trên máy có domain **core04.example.com** có nội dung sau:
+```
+dbms.default_listen_address=0.0.0.0
+dbms.default_advertised_address=core04.example.com
+dbms.mode=CORE
+causal_clustering.minimum_core_cluster_size_at_formation=3
+causal_clustering.minimum_core_cluster_size_at_runtime=3
+causal_clustering.discovery_members=core01.example.com:5000,core02.example.com:5000,core03.example.com:5000,core04.example.com:5000
+```
+Lúc này, các máy trong cụm cần được khởi chạy để tạo nên Cluser. Thứ tự khởi chạy các máy là không quan trọng.<br>
+Sau khi cluster khởi chạy thành công, chạy câu lệnh `sysinfo` trên [neo4j browser](http://localhost:7474) để kiểm tra trạng thái của cluser.
+#### Thêm một Read Replica vào cụm đã tồn tại
+Trong ví dụ này, một Read Replica với domain *replica01.example.com* sẽ được thêm vào cụm đã tạo trong chương [Configuration](#configuration). Trong file **neo4j.conf** trên máy có domain **replica01.example.com** có nội dung sau
+```
+dbms.mode=READ_REPLICA
+causal_clustering.discovery_members=core01.example.com:5000,core02.example.com:5000,core03.example.com:5000
+```
+
+Lúc này chỉ cần khởi chạy Read Replica, sau đó chạy câu lệnh `sysinfo` trên [neo4j browser](http://localhost:7474) để kiểm tra trạng thái của cluser.
+
+## Sao lưu
+Trong neo4j có hai kiểu sao lưu là online và offline. Sao lưu offline yêu cầu phải tắt Neo4j instance trước khi thực hiện. Sao lưu online không yêu cầu như vậy.<br>
+Để biết thêm thông tin về sao lưu offline, vui lòng xem [Dump and load databases](#https://neo4j.com/docs/operations-manual/3.5/tools/dump-load/)<br>
+Các chương dưới đây chỉ nói về sao lưu online.
+### Standalone databases
+
+#### Tham số cấu hình
+Bảng dưới đây liệt kê ra các tham số liên quan đến thực hiện sao lưu. Những tham số này được ghi trong file **neo4j.conf**<br>
+| Tham số | Giá trị mặc định | Mô tả |
+| --- | --- | --- |
+| dbms.backup.enabled | true | Cho phép thực hiện sao lưu hoặc không |
+| dbms.backup.address | 127.0.0.1:6362-6372 | Địa chỉ IP/domain của máy lắng nghe yêu cầu sao lưu |
+
+### Quy trình thực hiện sao lưu online
+Quy trình thực hiện sao lưu online gồm 2 bước sau<br>
+1. Backup server cần được cấu hình với các tham số như trong bảng trên.
+2. Từ một máy khác - gọi là backup client, đã cài đặt Neo4j, bật terminal và di chuyển đến thư mục cài đặt Neo4j, thực hiện câu lệnh *neo4j-admin backup*. Dữ liệu được sao lưu sẽ được lưu trên backup client.
+
+### Câu lệnh sao lưu online
+Cú pháp
+```
+neo4j-admin backup --backup-dir=<backup-path> --name=<graph.db-backup>
+                    [--from=<address>] [--protocol=<any|catchup|common>]
+                    [--fallback-to-full[=<true|false>]]
+                    [--pagecache=<pagecache>]
+                    [--timeout=<timeout>]
+                    [--check-consistency[=<true|false>]]
+                    [--additional-config=<config-file-path>]
+                    [--cc-graph[=<true|false>]]
+                    [--cc-indexes[=<true|false>]]
+                    [--cc-label-scan-store[=<true|false>]]
+                    [--cc-property-owners[=<true|false>]]
+                    [--cc-report-dir=<directory>]
+```
+Tuỳ chọn<br>
+
+| Tuỳ chọn | Giá trị mặc định | Mô tả |
+| --- | --- | --- |
+| protocol | any | Giao thức thực hiện sao lưu. Nếu tuỳ chọn này được đặt là **any** thì **cachup** sẽ được sử dụng trước. Nếu không thành công, quá trình sao lưu sẽ thử tuỳ chọn này với giá trị **common**. Giá trị này nên được cài đặt rõ rang. Đặt là **catchup** cho việc sao lưu cho cụm, và **common** cho việc sao lưu cho single database |
+| backup-dir | | Thư mục mà dữ liệu sao lưu sẽ được lưu |
+| name | | Tên của bản sao lưu |
+| from | localhost:6362 | Địa chỉ IP/domain của backup server (có thể xác định port) |
+
+Đối với các tham số cấu hình khác, vui lòng tham khảo [neo4j docs](https://neo4j.com/docs/operations-manual/3.5/backup/performing/)
+
+### Ví dụ
+Giả sử backup server được cấu hình với tham số sau:
+```
+dbms.backup.enabled=true
+dbms.backup.address=backup-server@example.com
+```
+Trên backup client, di chuyển tới thư mục cài đặt Neo4j và chạy câu lệnh sau trên terminal:
+```
+neo4j-admin backup
+  --protocol=any
+  --from=backup-server@example.com
+  --backup-dir=03/02/2020
+  --name=graph.db-graph
+```
+
+### Sao lưu Causal Clusters
+#### Tham số cấu hình
+Bảng dưới đây liệt kê ra các tham số liên quan đến thực hiện sao lưu. Những tham số này được ghi trong file **neo4j.conf**<br>
+| Tham số | Giá trị mặc định | Mô tả |
+| --- | --- | --- |
+| dbms.backup.enabled | true | Cho phép thực hiện sao lưu hoặc không |
+| dbms.backup.address | 127.0.0.1:6362-6372 | Địa chỉ IP/domain của máy lắng nghe yêu cầu sao lưu. |
+| dbms.backup.backup_policy |  | SSL policy được sử dụng trên backup port |
+
+#### Encrypted backups
+Encrypted backups are available with Causal Clustering.<br>
+Sao lưu được mã hoá có thể được áp dụng với cụm. Cả backup client và backup server cần phải được cấu hình với cùng một SSL policy.
+Xem phần [Intra-cluster encryption](https://neo4j.com/docs/operations-manual/3.5/clustering/intra-cluster-encryption/) để biết thêm chi tiết
+
+## Khôi phục
+### Câu lệnh khôi phục
+Cú pháp
+```
+neo4j-admin restore --from=<backup-directory> [--database=<name>] [--force[=<true|false>]]
+```
+Tuỳ chọn
+
+| Tuỳ chọn | Giá trị mặc định | Mô tả |
+| --- | --- | --- |
+| --from | | đường dẫn đến thư mục chứa dữ liệu sao lưu |
+| --database | neo4j | tên của database cần khôi phục |
+| --force | | Nếu database đã tồn tại, cho phép đặt ghi đè |
+
+### Khôi phục dữ liệu cho single database
+Thực hiện các bước sau:
+1. Tắt Neo4j instance đang chạy
+2. Chạy câu lệnh **neo4j-admin**
+3. Khởi chạy lại Neo4j instance
+
+**Ví dụ**: Khôi phục database từ thư mục có đường dẫn **/backup/2019_12_10/graph.db-backup**.
+Đầu tiên, di chuyển đến thư mục cài đặt Neo4j. Sau đó, thực hiện các câu lệnh sau:
+```
+./bin/neo4j stop
+./bin/neo4j-admin restore --from=/backup/2019_12_10/graph.db-backup --database=neo4j --force
+./bin/neo4j start
+```
+
+### Khôi phục cho cluster
+Để thực hiện khôi phục cho một cụm, các máy trong cụm cần phải được tách rời nhau bằng việc sử dụng câu lệnh **neo4j-admin unbind**
+Cú pháp câu lệnh unbind
+```
+neo4j-admin restore --from=<backup-directory> [--database=<name>] [--force[=<true|false>]]
+```
+Ví dụ, để unbind một máy core trong Core Server mà có tên database là **graph.db**, chạy câu lệnh sau:
+```
+neo4j-admin unbind --database=graph.db
+```
+Để khôi phục dữ liệu cho một cụm, thực hiện các bước sau:
+1. Tắt tất cả Neo4j instance trên các máy trong cụm.
+2. Chạy câu lệnh **neo4j-admin unbind** đối với mỗi máy trong cụm
+3. Thực hiện khôi phục dữ liệu trên mỗi máy trong cụm bằng câu lệnh **neo4j-admin restore**
+4. Khởi chạy lại toàn bộ các Neo4j instance.
+

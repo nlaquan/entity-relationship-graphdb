@@ -17,7 +17,7 @@ After that all the steps are described one by one below.
 
 * **Step 1**: <br>
 Copy the downloaded file to somewhere where you want to work, after the open you terminal go to that folder by
-```cd folderaddress```
+```cd /path/to/folder-that-you-want-to-install-neo4j```
 
 ```
 tar -xf Downloaded file name
@@ -76,7 +76,7 @@ causal_clustering.initial_discovery_members=core01.example.com:5000,core 02.exam
 ```
 Now we are ready to start the Neo4j servers. The startup order does not matter.
 
-After the cluster has started, we can connect to any of the instances and run **:sysinfo** to check
+After the cluster has started, we can connect to any of the instances and run `sysinfo` to check
 the status of the cluster. This will show information about each member of the cluster.
 
 We now have a Neo4j Causal Cluster of three instances running.
@@ -109,10 +109,7 @@ causal_clustering.discovery_members=core01.example.com:5000,core02.example.com:5
 Now we can start the new Read Replica and let it add itself to the existing cluster.
 
 ## Backup
-Online backups are typically required for production environments, but it is also possible to perform offline backups.<br>
-Offline backups are a more limited method for backing up a database. For example:<br>
 Online backups run against a live Neo4j instance, while offline backups require that the database is shut down.
-Online backups can be full or incremental, but there is no support for backing up incrementally with offline backups.
 For more details about offline backups, see [Dump and load databases](#https://neo4j.com/docs/operations-manual/3.5/tools/dump-load/)
 
 The remainder of this chapter is dedicated to describing online backups.
@@ -205,11 +202,11 @@ Options
 
 ### Restore a standalone server (single database)
 To restore from backups, follow these steps:
-1. If the server is running, shut it down.
-2. Run **neo4j-admin** restore for every database.
-3. Start up the server.
+1. If Neo4j instance is running, shut it down.
+2. Run **neo4j-admin** restore.
+3. Start up the Neo4j instance.
 
-**Example**: Restore the databases system and neo4j from the backups located in **/backup/2019_12_10/graph.db-backup**. Note that the server must be shut down.<br>
+**Example**: Restore the databases system and neo4j from the backups located in **/backup/2019_12_10/graph.db-backup**.<br>
 First of all, move to neo4j folder. Then, run the following commands
 ```
 ./bin/neo4j stop
