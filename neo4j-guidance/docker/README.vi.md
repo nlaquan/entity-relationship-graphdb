@@ -16,6 +16,56 @@ Neo4j Docker images sẽ expose mặc định 3 cổng sau cho việc truy cập
 * `7473` for HTTPS
 * `7687` for Bolt
 Các cổng này sẽ được dùng để truy cập đến Neo4j trong container thông qua Neo4j browser hoặc các phương thức khác.
+
+Có 3 cách để tuỳ chỉnh cấu hình trong Neo4j
+* Cài đặt thông qua biến môi trường.
+* Mount `/conf` volume.
+* Build một image mới.
+
+#### Cài đặt thông qua biến môi trường
+Truyền biến môi trường khi tạo và chạy container. Ví dụ:
+```
+docker run \
+    --detach \
+    --publish=7474:7474 --publish=7687:7687 \
+    --volume=$HOME/neo4j/data:/data \
+    --volume=$HOME/neo4j/logs:/logs \
+    --env NEO4J_dbms_memory_pagecache_size=4G \
+    neo4j:3.5.9-enterprise
+```
+Với câu lệnh trên `NEO4J_dbms_memory_pagecache_size=4G` là một biến môi trường được truyền vào để thay đổi cấu hình `dbms.memory.pagecache.size` trong Neo4j. Các cấu hình khác([Configuration settings](https://neo4j.com/docs/operations-manual/current/reference/configuration-settings/)) có thể được truyền truyền tới container sử dụng quy ước sau:
+* Prefix cấu hình cần thay đổi với NEO4J_.
+* Dấu gạch dưới (underscore) phải được ghi 2 lần: _ sẽ chuyển thành __.
+* Dấu chấm sẽ chuyển thành dấu gạch dưới: . chuyển thành _.
+Ví dụ, cấu hình `dbms.tx_log.rotation.size` được truyền vào Docker container như sau:
+```
+--env NEO4J_dbms_tx__log_rotation_size
+```
+##### Neo4j Enterprise Edition
+Những biến môi trường sau đây là dành riêng cho Causal Clustering và có sẵn trong Neo4j Enterprise Edition:
+* `NEO4J_dbms_mode:` database mode, giá trị mặc định là `SINGLE`. Đặt là `CORE` hoặc `READ_REPLICA` trong trường hợp triển khai Causal Clustering.
+* `NEO4J_causal__clustering_expected__core__cluster__size`: số lượng core trong cụm tại thời điểm bắt đầu triển khai cụm.
+* `NEO4J_causal__clustering_initial__discovery__members`: Địa chỉ mạng của các core đầu tiên trong cụm.
+* `NEO4J_causal__clustering_discovery__advertised__address`: Địa chỉ IP/domain và port cho quá trình phát hiện các thành phần trong cụm.
+* `NEO4J_causal__clustering_transaction__advertised__address`: Địa chỉ IP/doamin và port để tham gia vào quá trình xử lý transaction
+* `NEO4J_causal__clustering_raft__advertised__address`: Địa chỉ IP/domain và port cho quá trình giao tiếp trong cụm.
+#### Mount a /conf volume
+Để có thể chỉnh sửa nhiều cấu hình cùng một lúc, container có thể bind mount với volume `/conf`
+```
+docker run \
+    --detach \
+    --publish=7474:7474 --publish=7687:7687 \
+    --volume=$HOME/neo4j/data:/data \
+    --volume=$HOME/neo4j/logs:/logs \
+    --volume=$HOME/neo4j/conf:/conf \
+    neo4j:3.5.9-enterprise
+```
+Các file cấu hình trong thư mục `/conf` sẽ ghi đè cấu hình cung cấp bởi image. Vì vậy, nếu người dùng muốn thay đổi một giá trị trong một file thì cần phải đảm bảo rằng các giá trị còn lại là chính xác.
+Biến môi trường truyền tới container sẽ ghi đè các cấu hình được cung cấp trong thư mục `/conf`.
+
+#### Build một image mới
+Để biết thêm chi tiết, xem [tài liệu](https://neo4j.com/docs/operations-manual/current/docker/configuration/#docker-new-image).
+
 ### Single Database
 Để chạy một Neo4j instance trong một Docker container, chỉ cần thực hiện câu lệnh `docker run` với neo4j image kèm theo các tuỳ chọn và phiên bản. Một vài tuỳ chọn khi chạy câu lệnh `docker run` được mô tả như bảng dưới đây
 
@@ -33,11 +83,11 @@ Ví dụ với câu lệnh dưới đây:
 ```
 docker run \
     --name testneo4j \
-    -p7474:7474 -p7687:7687 \
+    -p7474:7474 -p7687:7687 -p7473:7474 \
     -d \
     -v $HOME/neo4j/data:/data \
     -v $HOME/neo4j/logs:/logs \
-    -v $HOME/neo4j/import:/var/lib/neo4j/import \
+    -v $HOME/neo4j/import:/import \
     -v $HOME/neo4j/plugins:/plugins \
     --env NEO4J_AUTH=neo4j/test \
     neo4j:latest
@@ -58,7 +108,7 @@ Khi chạy câu lệnh trên, nó sẽ tạo và khởi chạy một container<b
 Ví dụ dưới đây minh học việc cài đặt một cụm với 3 Core Server thông qua Docker.
 
 #### Ví dụ
-Trong ví dụ này, cụm sẽ được cài đặt với 3 Core Server với domain có tên lần lượt là: ***core01.example.com***, ***core02.example.com*** and ***core03.example.com***.<br>
+Trong ví dụ này, cụm sẽ được cài đặt với 3 Core Server với domain có tên lần lượt là: `core01.example.com`, `core02.example.com` and `core03.example.com`.<br>
 Chạy câu lệnh sau đối với mỗi server
 ```
 docker run --name=$NAME_OF_CONTAINER --detach \
@@ -78,23 +128,38 @@ docker run --name=$NAME_OF_CONTAINER --detach \
 Trong đó:
 * `$NAME_OF_CONTAINER` là tên của container.
 * `$EXPECTED_CORE_CLUSTER_SIZE` là số lượng core mong đợi sẽ có trong cụm. Giá trị mặc định là 3, giá trị nhỏ nhất là 2. Để biết thêm chi tiết, xem [configuration-settings](https://neo4j.com/docs/operations-manual/current/reference/configuration-settings/).
-* `$ADDRESS` là địa chỉ IP hoặc domain của mỗi server, trong ví dụ này, domain lần lượt là ***core01.example.com***, ***core02.example.com*** and ***core03.example.com***
+* `$ADDRESS` là địa chỉ IP hoặc domain của mỗi server, trong ví dụ này, domain lần lượt là `core01.example.com`, `core02.example.com` and `core03.example.com`
 
 Sau khi cluster khởi chạy thành công, chạy câu lệnh `sysinfo` trên [neo4j browser](http://localhost:7474) để kiểm tra trạng thái của cluser.
 
 ## Sao lưu
-Để sao lưu cho Neo4j database, thực hiện các bước sau:
+Các tham số cấu hình thực hiện sao lưu, vui lòng tham khảo phần `common/README.vi.md`
+
+Có 3 tình huống thực hiện sao lưu khi sử dụng với docker.
+1. Backup server chạy trên docker, backup client chạy trên docker.
+2. Backup server chạy trên docker, backup client chạy trên server thông thường.
+3. Backup server chạy trên máy tính thông thường, backup client chạy trên docker.
+
+Quy trình thực hiện sao lưu khi sử dụng với docker gồm 3 bước:
 1. Tạo một volume trong docker bằng cách sử dụng câu lệnh sau: (ví dụ `neo4j-backups`)
 ```
 docker volume create neo4j-backups
 ```
-2. Thực hiện câu lệnh sau trên terminal:
+2. Trong tất cả các trường hợp, backup server đều phải được cài đặt 2 cấu hình:
+```
+dbms.backup.enabled=true
+dbms.backup.address=0.0.0.0:6362
+```
+Để cài đặt cấu hình cho Neo4j chạy trên docker, tham khảo chương [Các tham số cài đặt](#các-tham-số-cài-đặt)
+
+3. Tham khảo `common/README.vi.md` trong trường hợp backup client chạy trên server thông thường.<br>
+Thực hiện câu lệnh sau trên terminal đối với trường hợp backup client chạy trên docker
 ```
 docker run --name=neo4j-backup -d \
-  --v neo4j-backups:/data \
-  --v $HOME/neo4j/logs:/logs \
-  --v $HOME/neo4j/import:/import \
-  --v $HOME/neo4j/plugins:/plugins \
+  -v neo4j-backups:/data \
+  -v $HOME/neo4j/logs:/logs \
+  -v $HOME/neo4j/import:/import \
+  -v $HOME/neo4j/plugins:/plugins \
   --env NEO4J_AUTH=neo4j/test \
   --env NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
   neo4j:enterprise /bin/bash -c "neo4j-admin backup --from=backup-server@example.com \
@@ -127,7 +192,7 @@ bin/bash -c "neo4j-admin backup --from=$ADDRESS \
 Thực hiện câu lệnh sau trên terminal:
 ```
 docker run --name neo4j -d \
-  -p7474:7474 -p7687:7687 \
+  -p7474:7474 -p7687:7687 -p7473:7473 \
   -v neo4j-backups:/backups:ro \
   -v $HOME/neo4j/data:/data \
   -v$HOME/neo4j/logs:/logs \

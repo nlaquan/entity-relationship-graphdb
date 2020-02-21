@@ -35,7 +35,7 @@ Now to run the neo4j run the below command:
 #### Configuration
 | Option | Description |
 | --- | --- |
-| dbms.default_listen_address | The address or network interface this machine uses to listen for incoming messages. Setting this value to **0.0.0.0** makes Neo4j bind to all available network interfaces. |
+| dbms.default_listen_address | The address or network interface this machine uses to listen for incoming messages. Setting this value to `0.0.0.0` makes Neo4j bind to all available network interfaces. |
 | dbms.default_advertised_address | The address that other machines are told to connect to. In the typical case, this should be set to the fully qualified domain name or the IP address of this server. |
 | dbms.mode | The operating mode of a single server instance. For Causal Clustering, there are two possible modes: CORE or READ_REPLICA. |
 | causal_clustering.minimum_core_cluster_size_at_formation | The minimum number of Core machines in the cluster at formation. A cluster will not form without the number of Cores defined by this setting, and this should in general be configured to the full and fixed amount. |
@@ -43,9 +43,9 @@ Now to run the neo4j run the below command:
 | causal_clustering.initial_discovery_members | The network addresses of an initial set of Core cluster members that are available to bootstrap this Core or Read Replica instance. In the default case, the initial discovery members are given as a comma-separated list of address/port pairs, and the default port for the discovery service is :5000 |
 
 The following example shows how to set up a simple cluster with three Core servers.<br>
-In this example, we will configure three Core Servers with the respective domain are ***core01.example.com***, ***core02.example.com*** and ***core03.example.com***. We have already installed Neo4j Enterprise Edition on all three servers. We configure them by edit **neo4j.conf** file on each server. Note that they are all identical, except for the configuration of ***dbms.default_advertised_address***.
+In this example, we will configure three Core Servers with the respective domain are `core01.example.com`, `core02.example.com` and `core03.example.com`. We have already installed Neo4j Enterprise Edition on all three servers. We configure them by edit `neo4j.conf` file on each server. Note that they are all identical, except for the configuration of `dbms.default_advertised_address`.
 
-**neo4j.conf on core01.example.com:**
+`neo4j.conf` on `core01.example.com`:
 ```
 dbms.connectors.default_listen_address=0.0.0.0
 dbms.connectors.default_advertised_address=core01.example.com
@@ -55,7 +55,7 @@ causal_clustering.minimum_core_cluster_size_at_runtime=3
 causal_clustering.initial_discovery_members=core01.example.com:5000,core 02.example.com:5000,core03.example.com:5000
 ```
 
-**neo4j.conf on core02.example.com:**
+`neo4j.conf` on `core02.example.com`:
 ```
 dbms.connectors.default_listen_address=0.0.0.0
 dbms.connectors.default_advertised_address=core02.example.com
@@ -65,7 +65,7 @@ causal_clustering.minimum_core_cluster_size_at_runtime=3
 causal_clustering.initial_discovery_members=core01.example.com:5000,core 02.example.com:5000,core03.example.com:5000
 ```
 
-**neo4j.conf on core03.example.com:**
+`neo4j.conf` on `core03.example.com`:
 ```
 dbms.connectors.default_listen_address=0.0.0.0
 dbms.connectors.default_advertised_address=core03.example.com
@@ -85,11 +85,11 @@ We now have a Neo4j Causal Cluster of three instances running.
 Core Servers are added to an existing cluster by starting a new Neo4j instance with
 the appropriate configuration.<br>
 
-The setting *causal_clustering.initial_discovery_members* shall be updated on all the servers
+The setting `causal_clustering.initial_discovery_members` shall be updated on all the servers
 in the cluster to include the new server.<br>
 
-In this example, we will add a Core Server, *core04.example.com*, to the cluster that we created in [Configuration](#configuration). We configure the following entries in **neo4j.conf**.<br>
-**neo4j.conf on core04.example.com**
+In this example, we will add a Core Server, `core04.example.com`, to the cluster that we created in [Configuration](#configuration). We configure the following entries in `neo4j.conf`.<br>
+`neo4j.conf` on `core04.example.com`
 ```
 dbms.default_listen_address=0.0.0.0
 dbms.default_advertised_address=core04.example.com
@@ -100,8 +100,8 @@ causal_clustering.discovery_members=core01.example.com:5000,core02.example.com:5
 ```
 Now we can start the new Core Server and let it add itself to the existing cluster.
 #### Add a Read Replica to an existing cluster
-In this example, we will add a Read Replica with domain: *replica01.example.com*, to the cluster that we created in [Configuration](#configuration). We configure the following entries in **neo4j.conf**.<br>
-**neo4j.conf on replica01.example.com**
+In this example, we will add a Read Replica with domain: `replica01.example.com`, to the cluster that we created in [Configuration](#configuration). We configure the following entries in `neo4j.conf`.<br>
+`neo4j.conf` on `replica01.example.com`
 ```
 dbms.mode=READ_REPLICA
 causal_clustering.discovery_members=core01.example.com:5000,core02.example.com:5000,core03.example.com:5000
@@ -116,7 +116,7 @@ The remainder of this chapter is dedicated to describing online backups.
 ### Standalone databases
 
 #### Configuration parameters
-The table below lists the configuration parameters relevant to backup. These parameters are configured in the **neo4j.conf** file.<br>
+The table below lists the configuration parameters relevant to backup. These parameters are configured in the `neo4j.conf` file.<br>
 
 | Parameter name | Default value | Description |
 | --- | --- | --- |
@@ -126,7 +126,7 @@ The table below lists the configuration parameters relevant to backup. These par
 ### Backup online process
 Backup online process follow these steps:<br>
 1. Backup server need to be configured with parameters shown in the above table.
-2. From another computer - called backup client. Open terminal and move the neo4j folder, execute *neo4j-admin backup* command. The data to be backed up will be stored on the backup client.
+2. From another computer - called backup client. Open terminal and move the neo4j folder, execute `neo4j-admin backup` command. The data to be backed up will be stored on the backup client.
 
 ### Backup online command
 Syntax
@@ -148,7 +148,7 @@ Options<br>
 
 | Option | Default | Description |
 | --- | --- | --- |
-| protocol | any | Protocol over which to perform backup. If set to **any**, then **catchup** will be tried first. If that fails, then it will attempt to fall back to **common**. It is recommended to set this option explicitly. Set it to **catchup** for Causal Cluster backups, and to **common** for HA or single-instance backups. |
+| protocol | any | Protocol over which to perform backup. If set to `any`, then `catchup` will be tried first. If that fails, then it will attempt to fall back to `common`. It is recommended to set this option explicitly. Set it to `catchup` for Causal Cluster backups, and to `common` for HA or single-instance backups. |
 | backup-dir | | Directory to place backup in. |
 | name | | Name of backup. |
 | from | localhost:6362 | Host and port of backup server |
@@ -172,7 +172,7 @@ neo4j-admin backup
 
 ### Causal Clusters Backup
 #### Configuration parameters
-The table below lists the configuration parameters relevant to backup. These parameters are configured in the **neo4j.conf** file.<br>
+The table below lists the configuration parameters relevant to backup. These parameters are configured in the `neo4j.conf` file.<br>
 
 | Parameter name | Default value | Description |
 | --- | --- | --- |
@@ -186,7 +186,7 @@ Both the server running the backup, and the backup target, must be configured wi
 
 ## Restore
 ### Restore command
-A Neo4j database can be restored using the restore command of **neo4j-admin**.
+A Neo4j database can be restored using the restore command of `neo4j-admin`.
 
 Syntax
 ```
@@ -203,10 +203,10 @@ Options
 ### Restore a standalone server (single database)
 To restore from backups, follow these steps:
 1. If Neo4j instance is running, shut it down.
-2. Run **neo4j-admin** restore.
+2. Run `neo4j-admin` restore.
 3. Start up the Neo4j instance.
 
-**Example**: Restore the databases system and neo4j from the backups located in **/backup/2019_12_10/graph.db-backup**.<br>
+**Example**: Restore the databases system and neo4j from the backups located in `/backup/2019_12_10/graph.db-backup`.<br>
 First of all, move to neo4j folder. Then, run the following commands
 ```
 ./bin/neo4j stop
@@ -215,18 +215,18 @@ First of all, move to neo4j folder. Then, run the following commands
 ```
 
 ### Restore a cluster
-In order to restore in a Causal Cluster, servers in Core Server need to be unbound from the cluster using **neo4j-admin unbind** command.<br>
+In order to restore in a Causal Cluster, servers in Core Server need to be unbound from the cluster using `neo4j-admin unbind` command.<br>
 Unbind command syntax
 ```
 neo4j-admin restore --from=<backup-directory> [--database=<name>] [--force[=<true|false>]]
 ```
-For example, in order to unbind for 1 server in Core Server whose database name is **graph.db**, run the following command
+For example, in order to unbind for 1 server in Core Server whose database name is `graph.db`, run the following command
 ```
 neo4j-admin unbind --database=graph.db
 ```
 To restore from a backup in a Causal Cluster, follow these steps:
 1. Shut down all database instances in the cluster.
-2. Run the **neo4j-admin unbind** command on each of the Core Servers.
-3. Restore the backup on each instance, using **neo4j-admin restore**.
+2. Run the `neo4j-admin unbind` command on each of the Core Servers.
+3. Restore the backup on each instance, using `neo4j-admin restore`.
 4. Start the database instances.
 
