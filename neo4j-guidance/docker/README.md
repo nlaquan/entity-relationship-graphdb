@@ -8,7 +8,7 @@ This guidance is used for neo4j version 3.5
 
 ## Install
 ### Single Database
-Retrieving and running Neo4j within a Docker container is very simple using one of the provided images. We will need to execute the basic **docker run** command with the neo4j image and specify any options or versions we want along with that. Let us take a look at a few options available with the **docker run** command.
+Retrieving and running Neo4j within a Docker container is very simple using one of the provided images. We will need to execute the basic `docker run` command with the neo4j image and specify any options or versions we want along with that. Let us take a look at a few options available with the `docker run` command.
 
 | Option | Description | Example |
 | --- | --- | --- |
@@ -69,8 +69,8 @@ docker run --name=$NAME_OF_CONTAINER --detach \
   neo4j:enterprise
 ```
 In which:
-* `$NAME_OF_CONTAINER` is the name of container (for example, you will probably name the servers respectively: **neo4j-core1**, **neo4j-core2**, **neo4j-core3**)
-* `$EXPECTED_CORE_CLUSTER_SIZE` is the the expected core cluster size
+* `$NAME_OF_CONTAINER` is the name of container.
+* `$EXPECTED_CORE_CLUSTER_SIZE` is the the expected core cluster size. The default value is 3 and the minimum value is 2. (see [configuration-settings](https://neo4j.com/docs/operations-manual/current/reference/configuration-settings/) for more information)
 * `$ADDRESS` is the IP address or domain of the each server: ***core01.example.com***, ***core02.example.com*** and ***core03.example.com***
 
 After the cluster has started, we can connect to any of the instances and run **:sysinfo** to check the status of the cluster. This will show information about each member of the cluster. We now have a Neo4j Causal Cluster of three instances running.
