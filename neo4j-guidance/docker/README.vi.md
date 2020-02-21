@@ -9,6 +9,13 @@ This guidance is used for neo4j version 3.5
 * [Khôi phục](#khôi-phục)
 
 ## Cài đặt
+### Các tham số cài đặt
+Neo4j Docker image đã đi kèm cùng với một vài tham số cài đặt mặc định. Các tham số này được liệt kê tại [đây](https://github.com/neo4j/docker-neo4j/blob/master/docker-image-src/3.5/docker-entrypoint.sh).<br>
+Neo4j Docker images sẽ expose mặc định 3 cổng sau cho việc truy cập từ xa:
+* `7474` for HTTP
+* `7473` for HTTPS
+* `7687` for Bolt
+Các cổng này sẽ được dùng để truy cập đến Neo4j trong container thông qua Neo4j browser hoặc các phương thức khác.
 ### Single Database
 Để chạy một Neo4j instance trong một Docker container, chỉ cần thực hiện câu lệnh `docker run` với neo4j image kèm theo các tuỳ chọn và phiên bản. Một vài tuỳ chọn khi chạy câu lệnh `docker run` được mô tả như bảng dưới đây
 

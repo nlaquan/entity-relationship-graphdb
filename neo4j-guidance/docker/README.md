@@ -7,6 +7,14 @@ This guidance is used for neo4j version 3.5
 * [Restore](#restore)
 
 ## Install
+### Neo4j configuration
+The Neo4j Docker image includes some basic configuration defaults that should not need adjustment for most cases. However, if interested, the full list of default configurations for Neo4j in Docker can be found on the GitHub repository.<br>
+By default, the Docker image exposes three ports for remote access:
+* `7474` for HTTP
+* `7473` for HTTPS
+* `7687` for Bolt
+We will use these ports to connect to Neo4j inside the container, accessing it from Neo4j Browser, an application, or other methods.<br>
+It is also possible to create a custom Docker image with Neo4j included, but we will not cover that here.
 ### Single Database
 Retrieving and running Neo4j within a Docker container is very simple using one of the provided images. We will need to execute the basic `docker run` command with the neo4j image and specify any options or versions we want along with that. Let us take a look at a few options available with the `docker run` command.
 
