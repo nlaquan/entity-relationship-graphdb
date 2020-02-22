@@ -69,12 +69,16 @@ function prepare(relMap, hierarchy, { entityRootFolder, entityFolderNames }, { r
     createHeaderFileForRel("Time", file3);
   });
 
-  entityFolderNames.forEach(e => createHeaderFile(`${entityRootFolder}/${e}/${e}Header.csv`, [
-    { id: "idSpace", title: `${e}Id:ID(${capitalize(e)}-ID)` },
-    { id: "name", title: 'name' },
-    { id: "description", title: 'description' },
-    { id: "label", title: ':LABEL' }
-  ]));
+  entityFolderNames.forEach(e => {
+    if (e !== "news" && e !== "fact" && e !== "time") {
+      createHeaderFile(`${entityRootFolder}/${e}/${e}Header.csv`, [
+        { id: "idSpace", title: `${e}Id:ID(${capitalize(e)}-ID)` },
+        { id: "name", title: 'name:string[]' },
+        { id: "description", title: 'description:string[]' },
+        { id: "label", title: ':LABEL' }
+      ])
+    }
+  });
 
   createHeaderFile(`${entityRootFolder}/news/newsHeader.csv`, [
     { id: "newsId", title: 'newsId:ID(News-ID)' },
