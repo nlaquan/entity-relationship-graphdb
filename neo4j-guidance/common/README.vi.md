@@ -3,11 +3,11 @@ Hướng dẫn này được viết cho Neo4j phiên bản 3.5
 
 ## 1 Nội dung
 * [Cài đặt](#2-cài-đặt)
-* [Sao lưu](#sao-lưu)
-* [Khôi phục](#khôi-phục)
+* [Sao lưu](#3-sao-lưu)
+* [Khôi phục](#4-khôi-phục)
 
 ## 2 Cài đặt
-### 2.1 Single Database
+### 2.1 Standalone/Single Database
 Trước hết, bạn cần tải file cài đặt (file tar với Linux/Mac, zip với Windows) từ trang download của [Neo4j](https://neo4j.com/download-center/#community). Đây là phiên bản miễn phí - community edition. Ngoài ra còn có một phiên bản trả phí (enterprise edition). Chọn phiên bạn Neo4j phù hợp với hệ thống của bạn và bấm nút Download. Sau khi tải về file cài đặt về, thực hiện lần lượt các bước cài đặt dưới đây cho cả hai phiên bản.
 
 * **Bước 1**: <br>
@@ -91,25 +91,27 @@ causal_clustering.discovery_members=core01.example.com:5000,core02.example.com:5
 
 Lúc này chỉ cần khởi chạy Read Replica để nó tự thêm vào trong cụm Casual Cluster, sau đó chạy câu lệnh `sysinfo` trên [neo4j browser](http://localhost:7474) để kiểm tra trạng thái của cluster.
 
-## 2. Sao lưu
+## 3 Sao lưu
 Trong Neo4j có hai kiểu sao lưu là online và offline. Sao lưu offline yêu cầu phải tắt các Neo4j instances trước khi thực hiện. Sao lưu online không yêu cầu như vậy.<br>
-Để biết thêm thông tin về sao lưu offline, vui lòng xem [Dump and load databases](https://neo4j.com/docs/operations-manual/3.5/tools/dump-load/).<br>
-Các chương dưới đây chỉ nói về sao lưu online.
-### 2.1 Standalone databases
+Để biết thêm thông tin về sao lưu offline, tham khảo thêm ở [Dump and load databases](https://neo4j.com/docs/operations-manual/3.5/tools/dump-load/).<br>
+Các nội dung dưới đây chỉ nói về sao lưu online.
 
-#### Tham số cấu hình
+### 2.1 Standalone database
+Tham khảo thêm trên trang: https://neo4j.com/docs/operations-manual/3.5/backup/standalone/
+
+#### a. Tham số cấu hình
 Bảng dưới đây liệt kê ra các tham số liên quan đến thực hiện sao lưu. Những tham số này được ghi trong file `neo4j.conf`<br>
 | Tham số | Giá trị mặc định | Mô tả |
 | --- | --- | --- |
 | dbms.backup.enabled | true | Cho phép thực hiện sao lưu hoặc không |
 | dbms.backup.address | 127.0.0.1:6362-6372 | Địa chỉ IP/domain của máy lắng nghe yêu cầu sao lưu |
 
-### Quy trình thực hiện sao lưu online
+#### b. Quy trình thực hiện sao lưu online
 Quy trình thực hiện sao lưu online gồm 2 bước sau<br>
 1. Backup server cần được cấu hình với các tham số như trong bảng trên.
 2. Từ một máy khác - gọi là backup client, đã cài đặt Neo4j, bật terminal và di chuyển đến thư mục cài đặt Neo4j, thực hiện câu lệnh `neo4j-admin backup`. Dữ liệu được sao lưu sẽ được lưu trên backup client.
 
-### Câu lệnh sao lưu online
+#### c. Câu lệnh sao lưu online
 Cú pháp
 ```
 neo4j-admin backup --backup-dir=<backup-path> --name=<graph.db-backup>
@@ -125,7 +127,7 @@ neo4j-admin backup --backup-dir=<backup-path> --name=<graph.db-backup>
                     [--cc-property-owners[=<true|false>]]
                     [--cc-report-dir=<directory>]
 ```
-Tuỳ chọn<br>
+Một số tuỳ chọn quan trọng trong cú pháp trên:<br>
 
 | Tuỳ chọn | Giá trị mặc định | Mô tả |
 | --- | --- | --- |
@@ -134,25 +136,25 @@ Tuỳ chọn<br>
 | name | | Tên của bản sao lưu |
 | from | localhost:6362 | Địa chỉ IP/domain của backup server (có thể xác định port) |
 
-Đối với các tham số cấu hình khác, vui lòng tham khảo [neo4j docs](https://neo4j.com/docs/operations-manual/3.5/backup/performing/)
+Chi tiết tất cả các tùy chọn được trình bày chi tiết tại [neo4j docs](https://neo4j.com/docs/operations-manual/3.5/backup/performing/)
 
-### Ví dụ
+#### d. Ví dụ
 Giả sử backup server được cấu hình với tham số sau:
 ```
 dbms.backup.enabled=true
-dbms.backup.address=backup-server@example.com
+dbms.backup.address=example.server.com
 ```
 Trên backup client, di chuyển tới thư mục cài đặt Neo4j và chạy câu lệnh sau trên terminal:
 ```
 neo4j-admin backup
   --protocol=any
-  --from=backup-server@example.com
+  --from=example.server.com
   --backup-dir=03/02/2020
   --name=graph.db-graph
 ```
 
-### Sao lưu Causal Clusters
-#### Tham số cấu hình
+### 2.2 Sao lưu Causal Clusters
+#### a. Tham số cấu hình
 Bảng dưới đây liệt kê ra các tham số liên quan đến thực hiện sao lưu. Những tham số này được ghi trong file `neo4j.conf`<br>
 | Tham số | Giá trị mặc định | Mô tả |
 | --- | --- | --- |
@@ -160,13 +162,13 @@ Bảng dưới đây liệt kê ra các tham số liên quan đến thực hiệ
 | dbms.backup.address | 127.0.0.1:6362-6372 | Địa chỉ IP/domain của máy lắng nghe yêu cầu sao lưu. |
 | dbms.backup.backup_policy |  | SSL policy được sử dụng trên backup port |
 
-#### Sao lưu được mã hoá
+#### b. Sao lưu được mã hoá
 Sao lưu được mã hoá có thể được áp dụng với cụm. Cả backup client và backup server cần phải được cấu hình với cùng một SSL policy.
 Xem phần [Intra-cluster encryption](https://neo4j.com/docs/operations-manual/3.5/clustering/intra-cluster-encryption/) để biết thêm chi tiết.
-Quy trình thực hiện các bước sao lưu đối với từng core trong cụm tương tự với sao lưu đối với single database.
+Quy trình thực hiện các bước sao lưu đối với từng core trong cụm tương tự như khi thực hiện sao lưu với single database.
 
-## Khôi phục
-### Câu lệnh khôi phục
+## 4 Khôi phục
+### 4.1 Câu lệnh khôi phục
 Cú pháp
 ```
 neo4j-admin restore --from=<backup-directory> [--database=<name>] [--force[=<true|false>]]
@@ -179,10 +181,10 @@ Tuỳ chọn
 | --database | neo4j | Tên của database cần khôi phục |
 | --force | | Nếu database đã tồn tại, cho phép đặt ghi đè |
 
-### Khôi phục dữ liệu cho single database
+### 4.2 Khôi phục dữ liệu cho single database
 Thực hiện các bước sau:
 1. Tắt Neo4j instance đang chạy
-2. Chạy câu lệnh `neo4j-admin`
+2. Chạy câu lệnh `neo4j-admin` nói trên
 3. Khởi chạy lại Neo4j instance
 
 **Ví dụ**: Khôi phục database từ thư mục có đường dẫn `/backup/2019_12_10/graph.db-backup`.
@@ -193,9 +195,9 @@ Thực hiện các bước sau:
 ./bin/neo4j start
 ```
 
-### Khôi phục cho cluster
+### 4.3 Khôi phục cho cluster
 Để thực hiện khôi phục cho một cụm, các máy trong cụm cần phải được tách rời nhau bằng việc sử dụng câu lệnh `neo4j-admin unbind`
-Cú pháp câu lệnh unbind
+Cú pháp câu lệnh unbind như sau
 ```
 neo4j-admin restore --from=<backup-directory> [--database=<name>] [--force[=<true|false>]]
 ```
