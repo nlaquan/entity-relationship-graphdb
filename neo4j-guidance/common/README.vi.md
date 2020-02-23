@@ -96,7 +96,7 @@ Trong Neo4j có hai kiểu sao lưu là online và offline. Sao lưu offline yê
 Để biết thêm thông tin về sao lưu offline, tham khảo thêm ở [Dump and load databases](https://neo4j.com/docs/operations-manual/3.5/tools/dump-load/).<br>
 Các nội dung dưới đây chỉ nói về sao lưu online.
 
-### 2.1 Standalone database
+### 3.1 Standalone database
 Tham khảo thêm trên trang: https://neo4j.com/docs/operations-manual/3.5/backup/standalone/
 
 #### a. Tham số cấu hình
@@ -153,7 +153,7 @@ neo4j-admin backup
   --name=graph.db-graph
 ```
 
-### 2.2 Sao lưu Causal Clusters
+### 3.2 Sao lưu Causal Clusters
 #### a. Tham số cấu hình
 Bảng dưới đây liệt kê ra các tham số liên quan đến thực hiện sao lưu. Những tham số này được ghi trong file `neo4j.conf`<br>
 | Tham số | Giá trị mặc định | Mô tả |
