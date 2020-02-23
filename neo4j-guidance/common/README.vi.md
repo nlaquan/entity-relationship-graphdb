@@ -2,7 +2,7 @@
 Hướng dẫn này được viết cho Neo4j phiên bản 3.5
 
 ## 1 Nội dung
-* [Cài đặt](#cài-đặt)
+* [Cài đặt](#2-cài-đặt)
 * [Sao lưu](#sao-lưu)
 * [Khôi phục](#khôi-phục)
 
@@ -92,7 +92,7 @@ causal_clustering.discovery_members=core01.example.com:5000,core02.example.com:5
 Lúc này chỉ cần khởi chạy Read Replica để nó tự thêm vào trong cụm Casual Cluster, sau đó chạy câu lệnh `sysinfo` trên [neo4j browser](http://localhost:7474) để kiểm tra trạng thái của cluster.
 
 ## 2. Sao lưu
-Trong Neo4j có hai kiểu sao lưu là online và offline. Sao lưu offline yêu cầu phải tắt các Neo4j instance trước khi thực hiện. Sao lưu online không yêu cầu như vậy.<br>
+Trong Neo4j có hai kiểu sao lưu là online và offline. Sao lưu offline yêu cầu phải tắt các Neo4j instances trước khi thực hiện. Sao lưu online không yêu cầu như vậy.<br>
 Để biết thêm thông tin về sao lưu offline, vui lòng xem [Dump and load databases](https://neo4j.com/docs/operations-manual/3.5/tools/dump-load/).<br>
 Các chương dưới đây chỉ nói về sao lưu online.
 ### 2.1 Standalone databases
