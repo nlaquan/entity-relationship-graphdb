@@ -1,45 +1,41 @@
-## Hướng dẫn thao tác với Neo4j database
+# Hướng dẫn cài đặt triển khai CSDL thực thể-quan hệ trên Neo4j
 Hướng dẫn này được viết cho Neo4j phiên bản 3.5
 
-## Nội dung
+## 1 Nội dung
 * [Cài đặt](#cài-đặt)
 * [Sao lưu](#sao-lưu)
 * [Khôi phục](#khôi-phục)
 
-## Cài đặt
-### Single Database
-Trước hết, bạn cần tải về file tar từ trang download của [Neo4j](https://neo4j.com/download-center/#community). Đây là phiên bản miễn phí - comminity. Ngoài ra còn có một phiên bản trả phí (enterprise). Chọn phiên bạn Neo4j phù hợp với hệ thống của bạn và bấm nút Download. Sau khi tải về file cài đặt về, thực hiện lần lượt các bước dưới đây.
+## 2 Cài đặt
+### 2.1 Single Database
+Trước hết, bạn cần tải file cài đặt (file tar với Linux/Mac, zip với Windows) từ trang download của [Neo4j](https://neo4j.com/download-center/#community). Đây là phiên bản miễn phí - community edition. Ngoài ra còn có một phiên bản trả phí (enterprise edition). Chọn phiên bạn Neo4j phù hợp với hệ thống của bạn và bấm nút Download. Sau khi tải về file cài đặt về, thực hiện lần lượt các bước cài đặt dưới đây cho cả hai phiên bản.
 
 * **Bước 1**: <br>
-Sao chép file đã tải về tới thư mục bạn muốn cài Neo4j, bật terminal lên, di chuyển đến thư mục cài đặt Neo4j bằng lệnh sau
-```cd /path/to/folder-that-you-want-to-install-neo4j```
-
-```
-tar -xf Downloaded file name
-ví dụ: $ tar -xf neo4j-enterprise-3.5.8-unix.tar.gz
-```
+Sao chép file đã tải về tới thư mục bất kỳ và giải nén. Ví dụ:
+```$ tar -xf neo4j-enterprise-3.5.8-unix.tar.gz```
 
 * **Bước 2**: <br>
-Di chuyển đến thư mục bạn đã giải nén Neo4j, ví dụ:
-```cd neo4j-enterprise-3.5.8```.<br>
-Lúc này chạy câu lệnh sau để khởi chạy Neo4j:
+Di chuyển đến thư mục Neo4j vừa giải nén, rồi start Neo4j như sau:<br>
+```cd neo4j-enterprise-3.5.8```<br>
 ```./bin/neo4j start```
 
-### Casual Cluster
+### 2.2 Casual Cluster
+Triển khai Casual Cluster giúp Neo4j có thể hoạt động an toàn và hiệu quả hơn với dữ liệu lớn. Tài liệu đầy đủ: https://neo4j.com/docs/operations-manual/current/clustering/. Một cluster bao gồm các Core Servers và các Read Replicas.
 
-#### Tham số cấu hình
+#### a. Tham số cấu hình
+Khi triển khai Casual Cluster, cần chú ý tới các tham số cấu hình chính sau đây
 | Tham số | Mô tả |
 | --- | --- |
 | dbms.default_listen_address | Địa chỉ hoặc giao diện mạng mà máy sử dụng để lắng nghe request tới. Đặt giá trị này là `0.0.0.0` để gắn tới bất kì giao diện mạng nào có sẵn |
 | dbms.default_advertised_address | Địa chỉ để các máy khác thực hiện kết nối tới. Thông thường, đây là địa chỉ IP hoặc domain |
-| dbms.mode | Chế độ của một single server instance. Trong chế độ Cluser, tham số này có 2 giá trị là: CORE hoặc READ_REPLICA |
+| dbms.mode | Chế độ hoạt động của một single server instance. Trong chế độ Cluser, tham số này có 2 giá trị là: CORE hoặc READ_REPLICA |
 | causal_clustering.minimum_core_cluster_size_at_formation | Số lượng máy nhỏ nhất trong cụm tại thời điểm thực hiện khởi tạo cluser. Một cluser sẽ không thể khởi tạo thành công nếu không xác định tham số này. Giá trị mặc định là `3` và giá trị nhỏ nhất có thể đặt là `2` |
-| causal_clustering.minimum_core_cluster_size_at_runtime | Số lượng core instance sẽ tồn tại trong cụm tại thời điểm runtime |
-| causal_clustering.initial_discovery_members | Danh sách địa chỉ IP/doamin của các máy để khởi tạo nên Cluser, thường được phân tách với nhau bởi sau phảy và cổng mặc dịnh là :5000 |
+| causal_clustering.minimum_core_cluster_size_at_runtime | Số lượng core instance nhỏ nhất sẽ tồn tại trong cụm tại thời điểm runtime |
+| causal_clustering.initial_discovery_members | Danh sách địa chỉ mạng (IP/domain) của các máy để khởi tạo nên Cluster, thường được phân tách với nhau bởi sau phẩy và cổng mặc dịnh là :5000 |
 
-Ví dụ dưới đây minh hoạ việc cài đặt một cụm với 3 máy Core. Trong ví dụ này, 3 máy core lần lượt có domain tương ứng là: `core01.example.com`, `core02.example.com` và `core03.example.com`. Neo4j Enterprise Edition đã được cài đặt trên cả 3 máy. Các cấu hình được chỉnh sửa trong file `neo4j.conf` mà Neo4j đã cung cấp.
+Ví dụ dưới đây minh hoạ việc cài đặt một cụm (Casual Cluster) với 3 máy Core. Trong ví dụ này, 3 máy core lần lượt có domain tương ứng là: `core01.example.com`, `core02.example.com` và `core03.example.com`. Neo4j Enterprise Edition đã được cài đặt trên cả 3 máy. Các cấu hình được chỉnh sửa trong file `neo4j.conf` có sẵn trong thư mục Neo4j đã cài đặt.
 
-Trong file `neo4j.conf` trên máy có `domain core01.example.com` thêm đoạn cấu hình sau:
+Trong file `neo4j.conf` trên máy có domain `core01.example.com`, thêm đoạn cấu hình sau:
 ```
 dbms.connectors.default_listen_address=0.0.0.0
 dbms.connectors.default_advertised_address=core01.example.com
@@ -49,7 +45,7 @@ causal_clustering.minimum_core_cluster_size_at_runtime=3
 causal_clustering.initial_discovery_members=core01.example.com:5000,core 02.example.com:5000,core03.example.com:5000
 ```
 
-Trong file `neo4j.conf` trên máy có domain `core02.example.com` thêm đoạn cấu hình sau:
+Trong file `neo4j.conf` trên máy có domain `core02.example.com`, thêm đoạn cấu hình sau:
 ```
 dbms.connectors.default_listen_address=0.0.0.0
 dbms.connectors.default_advertised_address=core02.example.com
@@ -59,7 +55,7 @@ causal_clustering.minimum_core_cluster_size_at_runtime=3
 causal_clustering.initial_discovery_members=core01.example.com:5000,core 02.example.com:5000,core03.example.com:5000
 ```
 
-Trong file `neo4j.conf` trên máy có domain `core03.example.com` thêm đoạn cấu hình sau:
+Trong file `neo4j.conf` trên máy có domain `core03.example.com`, thêm đoạn cấu hình sau:
 ```
 dbms.connectors.default_listen_address=0.0.0.0
 dbms.connectors.default_advertised_address=core03.example.com
@@ -68,12 +64,12 @@ causal_clustering.minimum_core_cluster_size_at_formation=3
 causal_clustering.minimum_core_cluster_size_at_runtime=3
 causal_clustering.initial_discovery_members=core01.example.com:5000,core 02.example.com:5000,core03.example.com:5000
 ```
-Lúc này, các máy cần được khởi chạy để tạo nên cluser. Thứ tự khởi chạy các máy là không quan trọng.<br>
-Sau khi cluster khởi chạy thành công, chạy câu lệnh `sysinfo` trên [neo4j browser](http://localhost:7474) để kiểm tra trạng thái của cluser.
+Lúc này, các máy cần được khởi chạy để tạo nên cluster. Thứ tự khởi chạy các máy là không quan trọng.<br>
+Sau khi cluster khởi chạy thành công, chạy câu lệnh `sysinfo` trên [neo4j browser](http://localhost:7474) để kiểm tra trạng thái của cluster.
 
-#### Thêm một Core vào cụm đã tồn tại
+#### b. Thêm một Core vào cụm đã tồn tại
 Core server được thêm vào cụm đã tồn tại bằng cách khởi chạy một Neo4j instance mới với các tham số cấu hình thích hợp.<br>
-Tham số `causal_clustering.initial_discovery_members` phải được cập nhật trên tất cả các máy trong cụm. <br>
+Tham số `causal_clustering.initial_discovery_members` sẽ được cập nhật trên tất cả các máy trong cụm. <br>
 Trong ví dụ dưới đây, một core server với domain `core04.example.com` sẽ được thêm vào cụm mà đã được tạo trong chương [Configuration](#configuration).<br>
 Trong file `neo4j.conf` trên máy có domain `core04.example.com` có nội dung sau:
 ```
@@ -84,22 +80,22 @@ causal_clustering.minimum_core_cluster_size_at_formation=3
 causal_clustering.minimum_core_cluster_size_at_runtime=3
 causal_clustering.discovery_members=core01.example.com:5000,core02.example.com:5000,core03.example.com:5000,core04.example.com:5000
 ```
-Lúc này, các máy trong cụm cần được khởi chạy để tạo nên Cluser. Thứ tự khởi chạy các máy là không quan trọng.<br>
-Sau khi cluster khởi chạy thành công, chạy câu lệnh `sysinfo` trên [neo4j browser](http://localhost:7474) để kiểm tra trạng thái của cluser.
-#### Thêm một Read Replica vào cụm đã tồn tại
+Tiếp đến, ta chạy Core server này để nó tự thêm vào trong cụm Casual Cluster
+
+#### c. Thêm một Read Replica vào cụm đã tồn tại
 Trong ví dụ này, một Read Replica với domain *replica01.example.com* sẽ được thêm vào cụm đã tạo trong chương [Configuration](#configuration). Trong file `neo4j.conf` trên máy có domain `replica01.example.com` có nội dung sau
 ```
 dbms.mode=READ_REPLICA
 causal_clustering.discovery_members=core01.example.com:5000,core02.example.com:5000,core03.example.com:5000
 ```
 
-Lúc này chỉ cần khởi chạy Read Replica, sau đó chạy câu lệnh `sysinfo` trên [neo4j browser](http://localhost:7474) để kiểm tra trạng thái của cluser.
+Lúc này chỉ cần khởi chạy Read Replica để nó tự thêm vào trong cụm Casual Cluster, sau đó chạy câu lệnh `sysinfo` trên [neo4j browser](http://localhost:7474) để kiểm tra trạng thái của cluster.
 
-## Sao lưu
-Trong Neo4j có hai kiểu sao lưu là online và offline. Sao lưu offline yêu cầu phải tắt Neo4j instance trước khi thực hiện. Sao lưu online không yêu cầu như vậy.<br>
-Để biết thêm thông tin về sao lưu offline, vui lòng xem [Dump and load databases](#https://neo4j.com/docs/operations-manual/3.5/tools/dump-load/).<br>
+## 2. Sao lưu
+Trong Neo4j có hai kiểu sao lưu là online và offline. Sao lưu offline yêu cầu phải tắt các Neo4j instance trước khi thực hiện. Sao lưu online không yêu cầu như vậy.<br>
+Để biết thêm thông tin về sao lưu offline, vui lòng xem [Dump and load databases](https://neo4j.com/docs/operations-manual/3.5/tools/dump-load/).<br>
 Các chương dưới đây chỉ nói về sao lưu online.
-### Standalone databases
+### 2.1 Standalone databases
 
 #### Tham số cấu hình
 Bảng dưới đây liệt kê ra các tham số liên quan đến thực hiện sao lưu. Những tham số này được ghi trong file `neo4j.conf`<br>
