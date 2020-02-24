@@ -107,10 +107,9 @@ Lưu ý: lần chạy đầu tiên, có thể phải accept license với Neo4j 
 ```--env NEO4J_ACCEPT_LICENSE_AGREEMENT=yes```
 
 ### 2.3 Cluster
-Ví dụ dưới đây minh học việc cài đặt một cụm với 3 Core Server thông qua Docker.
+Ví dụ dưới đây minh họa việc cài đặt một cụm với 3 Core Server thông qua Docker.
 
-#### Ví dụ
-Trong ví dụ này, cụm sẽ được cài đặt với 3 Core Server với domain có tên lần lượt là: `core01.example.com`, `core02.example.com` and `core03.example.com`.<br>
+Trong ví dụ này, cụm sẽ được cài đặt với 3 Core Server với domain có tên lần lượt là: `core01.example.com`, `core02.example.com` và `core03.example.com`.<br>
 Chạy câu lệnh sau đối với mỗi server
 ```
 docker run --name=$NAME_OF_CONTAINER --detach \
@@ -132,10 +131,46 @@ Trong đó:
 * `$EXPECTED_CORE_CLUSTER_SIZE` là số lượng core mong đợi sẽ có trong cụm. Giá trị mặc định là 3, giá trị nhỏ nhất là 2. Để biết thêm chi tiết, xem [configuration-settings](https://neo4j.com/docs/operations-manual/current/reference/configuration-settings/).
 * `$ADDRESS` là địa chỉ IP hoặc domain của mỗi server, trong ví dụ này, domain lần lượt là `core01.example.com`, `core02.example.com` and `core03.example.com`
 
-Sau khi cluster khởi chạy thành công, chạy câu lệnh `sysinfo` trên [neo4j browser](http://localhost:7474) để kiểm tra trạng thái của cluser.
+Sau khi cluster khởi chạy thành công, chạy câu lệnh `:sysinfo` trên [neo4j browser](http://localhost:7474) để kiểm tra trạng thái của cluster.
 
-## Sao lưu
-Các tham số cấu hình thực hiện sao lưu, vui lòng tham khảo phần `common/README.vi.md`
+Ví dụ tạo cluster với docker ở cùng máy host:
+
+```
+docker network create --driver=bridge cluster
+
+docker run --name=core1 --detach --network=cluster \
+    --publish=7474:7474 --publish=7473:7473 --publish=7687:7687 \
+    --env NEO4J_dbms_mode=CORE \
+    --env NEO4J_causal__clustering_expected__core__cluster__size=3 \
+    --env NEO4J_causal__clustering_initial__discovery__members=core1:5000,core2:5000,core3:5000 \
+    --env NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
+    --env NEO4J_dbms_connector_bolt_advertised__address=localhost:7687 \
+    --env NEO4J_dbms_connector_http_advertised__address=localhost:7474 \
+    neo4j:3.5.9-enterprise
+
+docker run --name=core2 --detach --network=cluster \
+    --publish=8474:7474 --publish=8473:7473 --publish=8687:7687 \
+    --env NEO4J_dbms_mode=CORE \
+    --env NEO4J_causal__clustering_expected__core__cluster__size=3 \
+    --env NEO4J_causal__clustering_initial__discovery__members=core1:5000,core2:5000,core3:5000 \
+    --env NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
+    --env NEO4J_dbms_connector_bolt_advertised__address=localhost:8687 \
+    --env NEO4J_dbms_connector_http_advertised__address=localhost:8474 \
+    neo4j:3.5.9-enterprise
+
+docker run --name=core3 --detach --network=cluster \
+    --publish=9474:7474 --publish=9473:7473 --publish=9687:7687 \
+    --env NEO4J_dbms_mode=CORE \
+    --env NEO4J_causal__clustering_expected__core__cluster__size=3 \
+    --env NEO4J_causal__clustering_initial__discovery__members=core1:5000,core2:5000,core3:5000 \
+    --env NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
+    --env NEO4J_dbms_connector_bolt_advertised__address=localhost:9687 \
+    --env NEO4J_dbms_connector_http_advertised__address=localhost:9474 \
+    neo4j:3.5.9-enterprise
+```
+
+## 3 Sao lưu
+Các tham số cấu hình thực hiện sao lưu, vui lòng tham khảo phần `standard installation/README.vi.md`
 
 Có 3 tình huống thực hiện sao lưu khi sử dụng với docker.
 1. Backup server chạy trên docker, backup client chạy trên docker.
@@ -143,7 +178,7 @@ Có 3 tình huống thực hiện sao lưu khi sử dụng với docker.
 3. Backup server chạy trên máy tính thông thường, backup client chạy trên docker.
 
 Quy trình thực hiện sao lưu khi sử dụng với docker gồm 3 bước:
-1. Tạo một volume trong docker bằng cách sử dụng câu lệnh sau: (ví dụ `neo4j-backups`)
+1. Tạo một volume trong docker bằng cách sử dụng câu lệnh sau: (ví dụ tên volume là `neo4j-backups`)
 ```
 docker volume create neo4j-backups
 ```
@@ -152,9 +187,9 @@ docker volume create neo4j-backups
 dbms.backup.enabled=true
 dbms.backup.address=0.0.0.0:6362
 ```
-Để cài đặt cấu hình cho Neo4j chạy trên docker, tham khảo chương [Các tham số cài đặt](#các-tham-số-cài-đặt)
+Để cài đặt cấu hình cho Neo4j chạy trên docker, tham khảo chương [Các tham số cài đặt](#2-.-1-các-tham-số-cài-đặt)
 
-3. Tham khảo `common/README.vi.md` trong trường hợp backup client chạy trên server thông thường.<br>
+3. Tham khảo `standard installation/README.vi.md` trong trường hợp backup client chạy trên server thông thường.<br>
 Thực hiện câu lệnh sau trên terminal đối với trường hợp backup client chạy trên docker
 ```
 docker run --name=neo4j-backup -d \
