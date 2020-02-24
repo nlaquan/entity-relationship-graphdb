@@ -1,28 +1,27 @@
-## Instructions for working with Neo4j database with docker
-This guidance is used for neo4j version 3.5
+# Hướng dẫn chạy Neo4j trên Docker
+Hướng dẫn này dành cho phiên bản Neo4j version 3.5
 
-## Hướng dẫn thao tác với Neo4j và docker
+## 1 Nội dung
+* [Cài đặt](#2-cài-đặt)
+* [Sao lưu](#3-sao-lưu)
+* [Khôi phục](#4-khôi-phục)
 
-## Nội dung
-* [Cài đặt](#cài-đặt)
-* [Sao lưu](#sao-lưu)
-* [Khôi phục](#khôi-phục)
-
-## Cài đặt
-### Các tham số cài đặt
+## 2 Cài đặt
+### 2.1 Các tham số cài đặt
 Neo4j Docker image đã đi kèm cùng với một vài tham số cài đặt mặc định. Các tham số này được liệt kê tại [đây](https://github.com/neo4j/docker-neo4j/blob/master/docker-image-src/3.5/docker-entrypoint.sh).<br>
 Neo4j Docker images sẽ expose mặc định 3 cổng sau cho việc truy cập từ xa:
 * `7474` for HTTP
 * `7473` for HTTPS
 * `7687` for Bolt
-Các cổng này sẽ được dùng để truy cập đến Neo4j trong container thông qua Neo4j browser hoặc các phương thức khác.
+<br>Các cổng này sẽ được dùng để truy cập đến Neo4j trong container thông qua Neo4j browser hoặc các phương thức khác.
 
 Có 3 cách để tuỳ chỉnh cấu hình trong Neo4j
 * Cài đặt thông qua biến môi trường.
 * Mount `/conf` volume.
 * Build một image mới.
+Dưới đây sẽ trình bày chi tiết 3 cách tùy chỉnh cấu hình này
 
-#### Cài đặt thông qua biến môi trường
+#### a. Cài đặt thông qua biến môi trường
 Truyền biến môi trường khi tạo và chạy container. Ví dụ:
 ```
 docker run \
@@ -33,15 +32,15 @@ docker run \
     --env NEO4J_dbms_memory_pagecache_size=4G \
     neo4j:3.5.9-enterprise
 ```
-Với câu lệnh trên `NEO4J_dbms_memory_pagecache_size=4G` là một biến môi trường được truyền vào để thay đổi cấu hình `dbms.memory.pagecache.size` trong Neo4j. Các cấu hình khác([Configuration settings](https://neo4j.com/docs/operations-manual/current/reference/configuration-settings/)) có thể được truyền truyền tới container sử dụng quy ước sau:
-* Prefix cấu hình cần thay đổi với NEO4J_.
-* Dấu gạch dưới (underscore) phải được ghi 2 lần: _ sẽ chuyển thành __.
-* Dấu chấm sẽ chuyển thành dấu gạch dưới: . chuyển thành _.
+Với câu lệnh trên `NEO4J_dbms_memory_pagecache_size=4G` là một biến môi trường được truyền vào để thay đổi cấu hình `dbms.memory.pagecache.size` trong Neo4j. Các cấu hình (xem danh sách các cấu hình trong [Configuration settings](https://neo4j.com/docs/operations-manual/current/reference/configuration-settings/)) có thể được truyền tới container với các quy ước sau:
+* Cấu hình được thêm vào tiền tố NEO4J_
+* Dấu gạch dưới (underscore) trong cấu hình được chuyển thành 2 dấu gạch dưới: _ sẽ chuyển thành __
+* Dấu chấm trong cấu hình sẽ chuyển thành dấu gạch dưới: . chuyển thành _
 Ví dụ, cấu hình `dbms.tx_log.rotation.size` được truyền vào Docker container như sau:
 ```
 --env NEO4J_dbms_tx__log_rotation_size
 ```
-##### Neo4j Enterprise Edition
+**Neo4j Enterprise Edition**
 Những biến môi trường sau đây là dành riêng cho Causal Clustering và có sẵn trong Neo4j Enterprise Edition:
 * `NEO4J_dbms_mode:` database mode, giá trị mặc định là `SINGLE`. Đặt là `CORE` hoặc `READ_REPLICA` trong trường hợp triển khai Causal Clustering.
 * `NEO4J_causal__clustering_expected__core__cluster__size`: số lượng core trong cụm tại thời điểm bắt đầu triển khai cụm.
@@ -49,7 +48,7 @@ Những biến môi trường sau đây là dành riêng cho Causal Clustering v
 * `NEO4J_causal__clustering_discovery__advertised__address`: Địa chỉ IP/domain và port cho quá trình phát hiện các thành phần trong cụm.
 * `NEO4J_causal__clustering_transaction__advertised__address`: Địa chỉ IP/doamin và port để tham gia vào quá trình xử lý transaction
 * `NEO4J_causal__clustering_raft__advertised__address`: Địa chỉ IP/domain và port cho quá trình giao tiếp trong cụm.
-#### Mount a /conf volume
+#### b. Mount a /conf volume
 Để có thể chỉnh sửa nhiều cấu hình cùng một lúc, container có thể bind mount với volume `/conf`
 ```
 docker run \
@@ -60,13 +59,13 @@ docker run \
     --volume=$HOME/neo4j/conf:/conf \
     neo4j:3.5.9-enterprise
 ```
-Các file cấu hình trong thư mục `/conf` sẽ ghi đè cấu hình cung cấp bởi image. Vì vậy, nếu người dùng muốn thay đổi một giá trị trong một file thì cần phải đảm bảo rằng các giá trị còn lại là chính xác.
-Biến môi trường truyền tới container sẽ ghi đè các cấu hình được cung cấp trong thư mục `/conf`.
+Tất cả các file cấu hình trong thư mục `/conf` sẽ ghi đè các file cấu hình cung cấp bởi image. Nếu người dùng muốn thay đổi một giá trị cấu hình nào đó trong một file, cần phải đảm bảo rằng các giá trị cấu hình còn lại là đầy đủ và chính xác.
+Biến môi trường truyền tới container trong lệnh Docker sẽ ghi đè các cấu hình được cung cấp trong thư mục `/conf`.
 
-#### Build một image mới
+#### c. Build một image mới
 Để biết thêm chi tiết, xem [tài liệu](https://neo4j.com/docs/operations-manual/current/docker/configuration/#docker-new-image).
 
-### Single Database
+### 2.2 Single Database
 Để chạy một Neo4j instance trong một Docker container, chỉ cần thực hiện câu lệnh `docker run` với neo4j image kèm theo các tuỳ chọn và phiên bản. Một vài tuỳ chọn khi chạy câu lệnh `docker run` được mô tả như bảng dưới đây
 
 | Tuỳ chọn | Mô tả | Ví dụ |
@@ -96,15 +95,18 @@ Trong câu lệnh trên:
 * Tạo và khởi chạy một container có tên là `testneo4j`
 * Tuỳ chọn `-d`, biểu thị rằng container này sẽ chạy background.
 * Tuỳ chọn `-v`, biểu thị rằng các thư mục trong container sẽ được bind mount vào các thư mục local, do đó có thể truy cập nội dung các thư mục này từ máy host. (Để biết thêm thông tin về `bind mount`, tham khảo [tài liệu](https://docs.docker.com/storage/bind-mounts/)).
-  - Dòng đầu tiên là bind mount cho thư mục /data - đây là nơi lưu chữ việc xác thực và quyền hạn cho mỗi database cũng như dữ liệu của mỗi database instance (trong thư mục graph.db)
+  - Dòng đầu tiên là bind mount cho thư mục /data - đây là nơi lưu trữ việc xác thực và quyền hạn cho mỗi database cũng như dữ liệu của mỗi database instance (trong thư mục graph.db)
   - Dòng thứ hai bind mount cho thư mục /logs. Logs của Neo4j sẽ được ghi ra thư mục host, cho phép người quản trị có thể phát hiện lỗi khi chạy Neo4j, thậm chí là container crash.
   - Dòng thứ ba bind mount thư mục /import. Các file csv có thể được sao chép vào đây cho việc thực hiện import trong Neo4j. Script cho việc thực hiện import cũng có thể được đặt vào thư mục này để thực hiện import.
   - Tuỳ chọn -v cuối cùng bind mount thư mục /plugins. Các extension, thư viện như Neo4j APOC hoặc các thư viện giải thuật đồ thị có thể được thêm vào đây (dưới dạng các file jars) để Neo4j trong Docker container có thể truy cập được.
 * Tuỳ chọn `--env`. Dòng này đặt tài khoản để đăng nhập vào Neo4j instance với tên người dùng và mật khẩu. Tài khoản đăng nhập mặc định là `neo4j/neo4j`. Vì Neo4j sẽ yêu cầu người dùng thay đổi password trong lần đầu đăng nhập, do đó việc sử dụng tuỳ chọn này sẽ bỏ qua quá trình đó.
 * Dòng cuối cùng của câu lệnh biểu thị rằng container sẽ chạy với Docker image `neo4j` và có phiên bản là `lastest`.
-Khi chạy câu lệnh trên, nó sẽ tạo và khởi chạy một container<br>Chạy câu lệnh `docker ps` trên terminal để kiểm tra các container đang chạy.
+Khi chạy câu lệnh trên, nó sẽ tạo và khởi chạy một container<br>Chạy câu lệnh `docker ps` trên terminal để kiểm tra các container đang chạy. Khi container Docker tương ứng đã chạy, mở trình duyệt, nhập địa chỉ http://localhost:7474 để xem kết quả cài đặt
 
-### Cluster
+Lưu ý: lần chạy đầu tiên, có thể phải accept license với Neo4j enterprise bằng cách thiết lập biến môi trường sau khi chạy docker:
+```--env NEO4J_ACCEPT_LICENSE_AGREEMENT=yes```
+
+### 2.3 Cluster
 Ví dụ dưới đây minh học việc cài đặt một cụm với 3 Core Server thông qua Docker.
 
 #### Ví dụ
