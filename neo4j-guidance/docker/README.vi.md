@@ -187,7 +187,7 @@ docker volume create neo4j-backups
 dbms.backup.enabled=true
 dbms.backup.address=0.0.0.0:6362
 ```
-Để cài đặt cấu hình cho Neo4j chạy trên docker, tham khảo chương [Các tham số cài đặt](#2-.-1-các-tham-số-cài-đặt)
+Để cài đặt cấu hình cho Neo4j chạy trên docker, tham khảo chương [Các tham số cài đặt](#21-các-tham-số-cài-đặt)
 
 3. Tham khảo `standard installation/README.vi.md` trong trường hợp backup client chạy trên server thông thường.<br>
 Thực hiện câu lệnh sau trên terminal đối với trường hợp backup client chạy trên docker
