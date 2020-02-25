@@ -4,7 +4,7 @@ The Neo4j data model (i.e., Neo4J node, label, relationships, properties) are op
 
 Project Resources:
 
-**1. neo4j administration** Our main instructions to administrate the system, including (i) Neo4j installation, (ii) data backup, (iii) data restore. Neo4j can either be installed in Mac, Win, and Linux or run in docker. To scale the storage ystem, we also provide detailed guideline on Neo4j [Causal Cluster](https://neo4j.com/docs/operations-manual/current/clustering/) deployment.
+**1. neo4j administration** Our main instructions to administrate the system, including (i) Neo4j installation, (ii) data backup, (iii) data restore. Neo4j can either be installed in Mac, Win, and Linux or run in docker. To scale the storage system, we also provide detailed guideline on Neo4j [Causal Cluster](https://neo4j.com/docs/operations-manual/current/clustering/) deployment.
 
 **2. storage-api** The project written in Node.js that provides developers with APIs (i.e., Restful services) to interact with the storage system. There have been ** services that allows developers to store and query data on entities and relationships
 
