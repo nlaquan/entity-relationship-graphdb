@@ -1,29 +1,13 @@
-## Entity-Relationshio-Graphdb
+This project develops a system to store and query entities and relationships extracts from news articles.
+The system can work smoothly with billions of entities and relationships, based on [Neo4j graph database](https://neo4j.com/).
+The Neo4j data model (i.e., Neo4J node, label, relationships, properties) are optimized.
 
-## Table of contents
-* [General info](#general-info)
-* [Technologies](#technologies)
-* [Setup](#setup)
+Project Resources:
 
-## General info
-This project
+**1. neo4j administration** Our main instructions to administrate the system, including (i) Neo4j installation, (ii) data backup, (iii) data restore. Neo4j can either be installed in Mac, Win, and Linux or run in docker. To scale the storage ystem, we also provide detailed guideline on Neo4j [Causal Cluster](https://neo4j.com/docs/operations-manual/current/clustering/) deployment.
 
-## Technologies
-This project use [Neo4j](https://neo4j.com/) for graph database.
+**2. storage-api** The project written in Node.js that provides developers with APIs (i.e., Restful services) to interact with the storage system. There have been ** services that allows developers to store and query data on entities and relationships
 
-## Setup
-This project include 4 sub project:
-* [Data simulation](#data-simulation)
-* [Dev api](#dev-api)
-* [Dev api documentation](#dev-api-documentation)
-* [Docker](#docker)
+**3. storage-api-docs** A ReactJS Project provides web-based documents to use the services provided in the **storage-api** project. Developers and/or anybody can easily test the services visually in a web interface.
 
-## Data simulation
-This project allow developer generate simulation data
-
-## Dev api
-
-## Dev api documentation
-
-## Docker
-This project contains guide and images for deploy each project with docker.
+**4. storage-data-simulation** A Node.js Project to generate simulation data. Data is generated in CSV files, based on our desired configuration of entities and relationships. Those CSV files can be imported into Neo4J database. This method allows us to generate a huge amount of data in a small amount of time. The data can then be used in performance testings.
