@@ -59,7 +59,7 @@ docker run \
     --volume=$HOME/neo4j/conf:/conf \
     neo4j:3.5.9-enterprise
 ```
-Tất cả các file cấu hình trong thư mục `/conf` sẽ ghi đè các file cấu hình cung cấp bởi image. Nếu người dùng muốn thay đổi một giá trị cấu hình nào đó trong một file, cần phải đảm bảo rằng các giá trị cấu hình còn lại là đầy đủ và chính xác.
+Tất cả các file cấu hình trong thư mục `/conf` sẽ ghi đè các file cấu hình cung cấp bởi image. Nếu muốn thay đổi một giá trị cấu hình nào đó trong một file, cần phải đảm bảo rằng các giá trị cấu hình còn lại là đầy đủ và chính xác.
 Biến môi trường truyền tới container trong lệnh Docker sẽ ghi đè các cấu hình được cung cấp trong thư mục `/conf`.
 
 #### c. Build một image mới
@@ -178,18 +178,18 @@ Có 3 tình huống thực hiện sao lưu khi sử dụng với docker.
 3. Backup server chạy trên máy tính thông thường, backup client chạy trên docker.
 
 Quy trình thực hiện sao lưu khi sử dụng với docker gồm 3 bước:
-1. Tạo một volume trong docker bằng cách sử dụng câu lệnh sau: (ví dụ tên volume là `neo4j-backups`)
+Bước 1: Tạo một volume trong docker bằng cách sử dụng câu lệnh sau: (ví dụ tên volume là `neo4j-backups`)
 ```
 docker volume create neo4j-backups
 ```
-2. Trong tất cả các trường hợp, backup server đều phải được cài đặt 2 cấu hình:
+Bước 2: Trong tất cả các trường hợp, backup server đều phải được cài đặt 2 cấu hình:
 ```
 dbms.backup.enabled=true
 dbms.backup.address=0.0.0.0:6362
 ```
 Để cài đặt cấu hình cho Neo4j chạy trên docker, tham khảo chương [Các tham số cài đặt](#21-các-tham-số-cài-đặt)
 
-3. Tham khảo `standard installation/README.vi.md` trong trường hợp backup client chạy trên server thông thường.<br>
+Bước 3: Tham khảo `standard installation/README.vi.md` trong trường hợp backup client chạy trên server thông thường.<br>
 Thực hiện câu lệnh sau trên terminal đối với trường hợp backup client chạy trên docker
 ```
 docker run --name=neo4j-backup -d \
@@ -199,40 +199,41 @@ docker run --name=neo4j-backup -d \
   -v $HOME/neo4j/plugins:/plugins \
   --env NEO4J_AUTH=neo4j/test \
   --env NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
-  neo4j:enterprise /bin/bash -c "neo4j-admin backup --from=backup-server@example.com \
+  neo4j:enterprise /bin/bash -c "neo4j-admin backup --from=example.server.com \
     --backup-dir=/data --name=graph.db-2020/02/03"
 ```
-Câu lệnh trên gồm 2 phần:
-* Phần khởi tạo container:
-  - Tạo và khởi chạy một container có tên là `neo4j-backup`
-  - Tuỳ chọn `-d`, biểu thị rằng container này sẽ chạy background.
-  - Tuỳ chọn `-v`, biểu thị rằng các thư mục trong container sẽ được mount/bind mount vào các thư mục local, do đó có thể truy cập nội dung các thư mục này từ máy host. (Để biết thêm thông tin về `bind mount`, tham khảo [tài liệu](https://docs.docker.com/storage/bind-mounts/), `mount/volume`, tham khảo [tài liệu](https://docs.docker.com/storage/volumes/)).
-    - Dòng đầu tiên là bind mount cho thư mục `/data` - đây là nơi lưu chữ việc xác thực và quyền hạn cho mỗi database cũng như dữ liệu của mỗi database instance (trong thư mục graph.db)
-    - Dòng thứ hai bind mount cho thư mục `/logs`. Logs của Neo4j sẽ được ghi ra thư mục host, cho phép người quản trị có thể phát hiện lỗi khi chạy Neo4j, thậm chí là container crash.
-    - Dòng thứ ba bind mount thư mục `/import`. Các file csv có thể được sao chép vào đây cho việc thực hiện import trong Neo4j. Script cho việc thực hiện import cũng có thể được đặt vào thư mục này để thực hiện import.
-    - Tuỳ chọn -v cuối cùng bind mount thư mục `/plugins`. Các extension, thư viện như Neo4j APOC hoặc các thư viện giải thuật đồ thị có thể được thêm vào đây (dưới dạng các file jars) để Neo4j trong Docker container có thể truy cập được.
-  - Tuỳ chọn `--env`. Dòng này đặt tài khoản để đăng nhập vào Neo4j instance với tên người dùng và mật khẩu. Tài khoản đăng nhập mặc định là `neo4j/neo4j`. Vì Neo4j sẽ yêu cầu người dùng thay đổi password trong lần đầu đăng nhập, do đó việc sử dụng tuỳ chọn này sẽ bỏ qua quá trình đó.
-  - Dòng cuối cùng của câu lệnh với nội dung: `neo4j:enterprise` rằng container sẽ chạy với Docker image `neo4j` và có phiên bản là `enterprise`. Phần còn lại của dòng này liên quan đến việc khởi chạy container.
-* Phần khởi chạy container: Mục tiêu của việc khởi chạy container này sao lưu dữ liệu từ một backup server (container này đóng vai trò backup client) do đó, cần phải cung cấp câu lệnh thực hiện sao lưu để container này thực hiện. Nội dung của câu lệnh này là:
+Câu lệnh trên gồm 2 phần: Phần khởi tạo container và Phần khởi chạy container<br>
+**Phần khởi tạo container**:
+- Tạo và khởi chạy một container có tên là `neo4j-backup`
+- Tùy chọn `-d`, biểu thị rằng container này sẽ chạy background.
+- Tùy chọn `-v`, biểu thị rằng các thư mục trong container sẽ được mount/bind mount vào các thư mục local, do đó có thể truy cập nội dung các thư mục này từ máy host. (Tham khảo thêm về [`bind mount`](https://docs.docker.com/storage/bind-mounts/) và [`mount/volume`](https://docs.docker.com/storage/volumes/)).
+  - Dòng đầu tiên là bind mount cho thư mục `/data` - đây là nơi lưu chữ việc xác thực và quyền hạn cho mỗi database cũng như dữ liệu của mỗi database instance (trong thư mục graph.db). Lưu ý: **cần dùng volume `neo4j-backups` đã tạo ở bước 1**.
+  - Dòng thứ hai bind mount cho thư mục `/logs`. Logs của Neo4j sẽ được ghi ra thư mục host, cho phép người quản trị có thể phát hiện lỗi khi chạy Neo4j, thậm chí là container crash.
+  - Dòng thứ ba bind mount thư mục `/import`. Các file csv có thể được sao chép vào đây cho việc thực hiện import trong Neo4j. Script cho việc thực hiện import cũng có thể được đặt vào thư mục này để thực hiện import.
+  - Tùy chọn -v cuối cùng bind mount thư mục `/plugins`. Các extension, thư viện như Neo4j APOC hoặc các thư viện giải thuật đồ thị có thể được thêm vào đây (dưới dạng các file jars) để Neo4j trong Docker container có thể truy cập được.
+- Tùy chọn `--env`. Dòng này đặt tài khoản để đăng nhập vào Neo4j instance với tên người dùng và mật khẩu. Tài khoản đăng nhập mặc định là `neo4j/neo4j`. Vì Neo4j sẽ yêu cầu người dùng thay đổi password trong lần đầu đăng nhập, do đó việc sử dụng tùy chọn này sẽ bỏ qua quá trình đó.
+- Dòng cuối cùng của câu lệnh bắt đầu với nội dung: `neo4j:enterprise` chỉ ra rằng container sẽ chạy với Docker image `neo4j` và có phiên bản là `enterprise` (sẽ là image ứng phiên bản enterprise mới nhất, có thể chạy với phiên bản khác như `neo4j:3.5.9-enterprise`). Phần còn lại của dòng này là thành phần số 2: phần khởi chạy container.<br>
+
+**Phần khởi chạy container**: Mục tiêu của việc khởi chạy container này là sao lưu dữ liệu từ một backup server (container đang khởi chạy này đóng vai trò backup client). Do đó, cần cung cấp câu lệnh thực hiện sao lưu để container này thực hiện. Nội dung của câu lệnh này là:
 ```
 bin/bash -c "neo4j-admin backup --from=$ADDRESS \
 --backup-dir=/data --name=$NAME
 ```
   - `bin/bash -c` biểu thị việc thực hiện câu lệnh trong môi trường bash/shell của container.
-  - `neo4j-admin backup --from=backup-server@example.com --backup-dir=/data --name=graph.db-2020/02/03` là câu lệnh thực hiện sao lưu online của Neo4j.
-    - Tuỳ chọn `--from=backup-server@example.com` xác định địa chỉ backup server là máy tính có domain là `backup-server@example.com`.
-    - Tuỳ chọn `--backup-dir=/data` chỉ ra thư mục sẽ lưu dữ liệu sao lưu trên container này là `/data` (do đã mount thư mục `/data` với volume `neo4j-backups` nên dữ liệu được sao lưu ra thư mục `/data` cũng sẽ có trong volume `neo4j-backups`)
-    - Tuỳ chọn `--name=grpah.db-2020/02/03` chỉ ra tên của bản sao lưu này.
+  - `neo4j-admin backup --from=example.server.com --backup-dir=/data --name=graph.db-2020/02/03` là câu lệnh thực hiện sao lưu online của Neo4j.
+    - Tùy chọn `--from=example.server.com` xác định địa chỉ backup server là máy tính có domain là `example.server.com`.
+    - Tùy chọn `--backup-dir=/data` chỉ ra thư mục sẽ lưu dữ liệu sao lưu trên container này là `/data`. Do đã mount thư mục `/data` với volume `neo4j-backups` (tạo trong bước 1) nên dữ liệu được sao lưu ra thư mục `/data` cũng sẽ có trong volume `neo4j-backups`
+    - Tùy chọn `--name=graph.db-2020/02/03` chỉ ra tên của bản sao lưu này.
 
-## Khôi phục
-**Yêu cầu**: phải chuẩn bị sẵn một volume chứa dữ liệu sao lưu. Ví dụ volume `neo4j-backups`  đã tồn tại và đã chứa dữ liệu sao lưu<br>
+## 4 Khôi phục
+**Yêu cầu**: phải chuẩn bị sẵn một volume chứa dữ liệu sao lưu. Ví dụ volume `neo4j-backups` đã tạo và đã chứa dữ liệu sao lưu như thực hiện trong phần [Sao lưu](#3-sao-lưu)<br>
 Thực hiện câu lệnh sau trên terminal:
 ```
 docker run --name neo4j -d \
   -p7474:7474 -p7687:7687 -p7473:7473 \
   -v neo4j-backups:/backups:ro \
   -v $HOME/neo4j/data:/data \
-  -v$HOME/neo4j/logs:/logs \
+  -v $HOME/neo4j/logs:/logs \
   -v $HOME/neo4j/import:/import \
   -v $HOME/neo4j/plugins:/plugins \
   --env NEO4J_AUTH=neo4j/test \
@@ -240,19 +241,20 @@ docker run --name neo4j -d \
   --from=/backups/ --database=graph.db-2020/02/03 --force; \
   neo4j console"
 ```
-Câu lệnh trên gồm 2 phần:
-* Phần khởi tạo container:
-  - Tạo và khởi chạy một container có tên là `neo4j`
-  - Tuỳ chọn `-d`, biểu thị rằng container này sẽ chạy background.
-  - Tuỳ chọn `-v`, biểu thị rằng các thư mục trong container sẽ được mount/bind mount vào các thư mục local, do đó có thể truy cập nội dung các thư mục này từ máy host. (Để biết thêm thông tin về `bind mount`, tham khảo [tài liệu](https://docs.docker.com/storage/bind-mounts/), `mount/volume`, tham khảo [tài liệu](https://docs.docker.com/storage/volumes/)).
-    - Dòng thứ nhất là mount thư mục `/backups` trong container với volume `neo4j-backups`, điều này cho phép container này có thể nhận được dữ liệu sao lưu trong volume `neo4j-backups`.
-    - Dòng thứ hai là bind mount cho thư mục `/data` - đây là nơi lưu chữ việc xác thực và quyền hạn cho mỗi database cũng như dữ liệu của mỗi database instance (trong thư mục graph.db)
-    - Dòng thứ ba bind mount cho thư mục `/logs`. Logs của Neo4j sẽ được ghi ra thư mục host, cho phép người quản trị có thể phát hiện lỗi khi chạy Neo4j, thậm chí là container crash.
-    - Dòng thứ tư bind mount thư mục `/import`. Các file csv có thể được sao chép vào đây cho việc thực hiện import trong Neo4j. Script cho việc thực hiện import cũng có thể được đặt vào thư mục này để thực hiện import.
-    - Tuỳ chọn -v cuối cùng bind mount thư mục `/plugins`. Các extension, thư viện như Neo4j APOC hoặc các thư viện giải thuật đồ thị có thể được thêm vào đây (dưới dạng các file jars) để Neo4j trong Docker container có thể truy cập được.
-  - Tuỳ chọn `--env`. Dòng này đặt tài khoản để đăng nhập vào Neo4j instance với tên người dùng và mật khẩu. Tài khoản đăng nhập mặc định là `neo4j/neo4j`. Vì Neo4j sẽ yêu cầu người dùng thay đổi password trong lần đầu đăng nhập, do đó việc sử dụng tuỳ chọn này sẽ bỏ qua quá trình đó.
-  - Dòng cuối cùng của câu lệnh với nội dung: `neo4j:enterprise` rằng container sẽ chạy với Docker image `neo4j` và có phiên bản là `enterprise`. Phần còn lại của dòng này liên quan đến việc khởi chạy container.
-* Phần khởi chạy container: Mục tiêu của việc khởi chạy container này khôi phục dữ liệu từ dữ liệu sao lưu. Do đó, khi khởi chạy, container này sẽ phải thực hiện 2 quá trình: 1. Khôi phục dữ liệu từ dữ liệu sao lưu; 2. Khởi chạy Neo4j instance với dữ liệu đã được khôi phục. Câu lệnh để thực hiện 2 nhiệm vụ trên như sau:
+Câu lệnh trên gồm 2 phần: Phần khởi tạo container và Phần khởi chạy container<br>
+**Phần khởi tạo container**:
+- Tạo và khởi chạy một container có tên là `neo4j`
+- Tùy chọn `-d`, biểu thị rằng container này sẽ chạy background.
+- Tùy chọn `-v`, biểu thị rằng các thư mục trong container sẽ được mount/bind mount vào các thư mục local, do đó có thể truy cập nội dung các thư mục này từ máy host. (Tham khảo thêm về [`bind mount`](https://docs.docker.com/storage/bind-mounts/) và [`mount/volume`](https://docs.docker.com/storage/volumes/)).
+   - Dòng thứ nhất là mount thư mục `/backups` trong container với volume `neo4j-backups`, điều này cho phép container này có thể nhận được dữ liệu sao lưu lưu trong volume `neo4j-backups`.
+   - Dòng thứ hai là bind mount cho thư mục `/data` - đây là nơi lưu chữ việc xác thực và quyền hạn cho mỗi database cũng như dữ liệu của mỗi database instance (trong thư mục graph.db)
+   - Dòng thứ ba bind mount cho thư mục `/logs`. Logs của Neo4j sẽ được ghi ra thư mục host, cho phép người quản trị có thể phát hiện lỗi khi chạy Neo4j, thậm chí là container crash.
+   - Dòng thứ tư bind mount thư mục `/import`. Các file csv có thể được sao chép vào đây cho việc thực hiện import trong Neo4j. Script cho việc thực hiện import cũng có thể được đặt vào thư mục này để thực hiện import.
+   - Tùy chọn -v cuối cùng bind mount thư mục `/plugins`. Các extension, thư viện như Neo4j APOC hoặc các thư viện giải thuật đồ thị có thể được thêm vào đây (dưới dạng các file jars) để Neo4j trong Docker container có thể truy cập được.
+- Tùy chọn `--env`. Dòng này đặt tài khoản để đăng nhập vào Neo4j instance với tên người dùng và mật khẩu. Tài khoản đăng nhập mặc định là `neo4j/neo4j`. Vì Neo4j sẽ yêu cầu người dùng thay đổi password trong lần đầu đăng nhập, do đó việc sử dụng tuỳ chọn này sẽ bỏ qua quá trình đó.
+- Dòng cuối cùng của câu lệnh bắt đầu với nội dung: `neo4j:enterprise` chỉ ra rằng container sẽ chạy với Docker image `neo4j` và có phiên bản là `enterprise` (sẽ là image ứng phiên bản enterprise mới nhất, có thể chạy với phiên bản khác như `neo4j:3.5.9-enterprise`). Phần còn lại của dòng này là thành phần số 2: phần khởi chạy container.<br>
+
+**Phần khởi chạy container**: Mục tiêu của việc khởi chạy container này khôi phục dữ liệu từ dữ liệu sao lưu. Do đó, khi khởi chạy, container này sẽ phải thực hiện 2 bước: Bước 1 - Khôi phục dữ liệu từ dữ liệu sao lưu; Bước 2 - Khởi chạy Neo4j instance với dữ liệu đã được khôi phục. Câu lệnh để thực hiện 2 nhiệm vụ trên như sau:
 ```
 /bin/bash -c "neo4j-admin restore \
 --from=/backups/ --database=$NAME --force;
@@ -260,6 +262,6 @@ neo4j console \
 ```
   - `bin/bash -c` biểu thị việc thực hiện câu lệnh trong môi trường bash/shell của container.
   - `neo4j-admin restore --from=/backups/ --database=$graph.db --force` là câu lệnh thực hiện sao lưu online của Neo4j.
-    - Tuỳ chọn `--from=/backups/` chỉ ra đường dẫn tới thư mục chứa dữ liệu là `/backups` - đây là thư mục đã được mount với volume chứa dữ liệu sao lưu.
-    - Tuỳ chọn `--database=graph.db-2020/02/03` là tên của dữ liệu sao lưu.
+    - Tùy chọn `--from=/backups/` chỉ ra đường dẫn tới thư mục chứa dữ liệu là `/backups` - đây là thư mục đã được mount với volume chứa dữ liệu sao lưu.
+    - Tùy chọn `--database=graph.db-2020/02/03` là tên của dữ liệu sao lưu.
   - `neo4j console` là câu lệnh khởi chạy Neo4j.
