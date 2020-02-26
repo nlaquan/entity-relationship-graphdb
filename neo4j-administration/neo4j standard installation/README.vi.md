@@ -197,13 +197,9 @@ Thực hiện các bước sau:
 
 ### 4.3 Khôi phục cho cluster
 Để thực hiện khôi phục cho một cụm, các máy trong cụm cần phải được tách rời nhau bằng việc sử dụng câu lệnh `neo4j-admin unbind`
-Cú pháp câu lệnh unbind như sau
+Ví dụ, để unbind một máy core trong Core Server, chạy câu lệnh sau:
 ```
-neo4j-admin restore --from=<backup-directory> [--database=<name>] [--force[=<true|false>]]
-```
-Ví dụ, để unbind một máy core trong Core Server mà có tên database là `graph.db`, chạy câu lệnh sau:
-```
-neo4j-admin unbind --database=graph.db
+neo4j-admin unbind
 ```
 Để khôi phục dữ liệu cho một cụm, thực hiện các bước sau:
 1. Tắt tất cả Neo4j instance trên các máy trong cụm.
