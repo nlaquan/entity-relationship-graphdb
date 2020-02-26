@@ -1,32 +1,27 @@
-## Data simulation
+# Giới thiệu
 
-## Table of contents
-* [General info](#general-info)
-* [Technologies](#technologies)
-* [Setup](#setup)
+Project này cho phép sinh lượng cực lớn dữ liệu mô phỏng các thực thể và quan hệ trích xuất từ các bài báo mạng. Dữ liệu được sinh ra dưới định dạng CSV, tùy theo cấu hình cho trước về số lượng thực thể và quan hệ muốn sinh. Các file CSV sau đó có thể được import vào cơ sở dữ liệu Neo4j. Cách làm này cho phép tạo lượng dữ liệu rất lớn trong thời gian ngắn, phục vụ cho việc kiểm thử hiệu năng hệ thống
 
-## General info
-This project generate data for querying and archiving performance tests for relational entity storage problems.
+# Cài đặt
 
-## Technologies
-This project use [Nodejs](https://nodejs.org/en/).
+- Download project
+- Mở terminal, cd vào thư mục project đã download
+- Chạy lệnh `npm install` để cài đặt các thư viện cần thiết (hoặc lệnh `yarn install`)
 
-## Setup
-* Installing ```yarn``` in advance.
-* In order to generate data simulation, execute the following commands
+# Sinh dữ liệu mô phỏng
+
+Chạy lệnh sau để sinh dữ liệu mô phỏng
 ```
-yarn install
 node src/index path/to/configuration/file
 ```
+Một số file cấu hình tạo trước có thể được tham khảo trong thư mục `src`
 
-* After the command completes, copy the entire the subdirectory of the directory ```import```
-to the folder ```import``` of project folder neo4j
-* Copy ```script.sh``` file to the project folder neo4j
-* Then, open terminal from current neo4j folder, run the following command:
-```
-chmod +x script.sh
-```
-* Finally, run the following command:
-```
-./script.sh
-```
+Sau khi kết thúc lệnh, trong thư mục hiện tại sẽ có thư mục con là thư mục `import`, chứa tập các file CSV đặc tả các thực thể và các quan hệ cần sinh. Kích thước các file CSV đã được tối ưu hóa, giúp tăng tốc độ khi import vào CSDL Neo4j. Đồng thời, file `script.sh` được sinh tự động trong thư mục import, sẽ được gọi đến để import các file CSV vào CSDL Neo4j.
+
+# Import dữ liệu vào Neo4j
+
+Để import các file CSV đã sinh vào Neo4j, thực hiện các bước sau đây:
+- Copy tất cả các thư mục con của thư mục `import` vừa sinh vào trong thư mục `import` của Neo4j
+- Copy file ```script.sh``` vào thư mục Neo4j
+- Mở terminal, vào trong thư mục Neo4j, thực hiện lệnh ```chmod +x script.sh```
+- Sau cùng, thực thi script bằng lệnh sau ```./script.sh```. Dữ liệu sẽ được import vào CSDL default của Neo4j
