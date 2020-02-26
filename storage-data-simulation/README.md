@@ -20,6 +20,8 @@ Sau khi kết thúc lệnh, trong thư mục hiện tại sẽ có thư mục co
 
 # Import dữ liệu vào Neo4j
 
+Lưu ý: Chỉ được import khi DB rỗng, vừa được tạo, không được chứa bất kỳ dữ liệu gì. Và không được start Neo4j khi chạy lệnh import.
+
 Để import các file CSV đã sinh vào Neo4j, thực hiện các bước sau đây:
 - Copy tất cả các thư mục con của thư mục `import` vừa sinh vào trong thư mục `import` của Neo4j
 - Copy file ```script.sh``` vào thư mục Neo4j
