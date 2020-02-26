@@ -15,11 +15,11 @@ Project Resources (3 projects and documents to adminitrate the system):
 **4. storage-data-simulation** A Node.js Project to generate simulation data. Data is generated in CSV files, based on our desired configuration of entities and relationships. Those CSV files can be imported into Neo4J database. This method allows us to generate a huge amount of data in a small amount of time. The data can then be used in performance testings.
 
 # How to use the projects
-Step 1: Read our **neo4j administration** instruction to install Neo4j
+Step 1: Read our **neo4j administration** instructions to install Neo4j
 
-Step 2: Install **storage-api** to provide services to store and query entities and relationships extracted from news articles
+Step 2: Install **storage-api** to establish services to store and query entities and relationships extracted from news articles
 
-Step 3: Install **storage-api-docs** to learn and practice the installed services
+Step 3: Install **storage-api-docs** to learn and practice the services
 
 Step 4: Use **storage-data-simulation** to generage a huge amount of data for performance testing
 
