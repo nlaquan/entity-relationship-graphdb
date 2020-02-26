@@ -1,9 +1,9 @@
 FROM node:13
 
-RUN mkdir /home/node/ergraphdb-dev-api && chown -R node:node /home/node/ergraphdb-dev-api
+RUN mkdir /home/node/storage-api && chown -R node:node /home/node/storage-api
 
 # Create app directory
-WORKDIR /home/node/ergraphdb-dev-api
+WORKDIR /home/node/storage-api
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied

@@ -1,9 +1,9 @@
 FROM node:13
 
-RUN mkdir /home/node/ergraphdb-dev-api-docs && chown -R node:node /home/node/ergraphdb-dev-api-docs
+RUN mkdir /home/node/storage-api-docs && chown -R node:node /home/node/storage-api-docs
 
 # Create app directory
-WORKDIR /home/node/ergraphdb-dev-api-docs
+WORKDIR /home/node/storage-api-docs
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
@@ -19,6 +19,6 @@ RUN yarn install
 # Bundle app source
 COPY --chown=node:node . .
 
-EXPOSE 3000
+EXPOSE 3002
 
 CMD [ "yarn", "start" ]
