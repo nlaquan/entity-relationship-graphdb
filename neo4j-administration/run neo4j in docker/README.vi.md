@@ -212,7 +212,7 @@ Câu lệnh trên gồm 2 phần: Phần khởi tạo container và Phần khở
   - Dòng thứ ba bind mount thư mục `/import`. Các file csv có thể được sao chép vào đây cho việc thực hiện import trong Neo4j. Script cho việc thực hiện import cũng có thể được đặt vào thư mục này để thực hiện import.
   - Tùy chọn -v cuối cùng bind mount thư mục `/plugins`. Các extension, thư viện như Neo4j APOC hoặc các thư viện giải thuật đồ thị có thể được thêm vào đây (dưới dạng các file jars) để Neo4j trong Docker container có thể truy cập được.
 - Tùy chọn `--env`. Dòng này đặt tài khoản để đăng nhập vào Neo4j instance với tên người dùng và mật khẩu. Tài khoản đăng nhập mặc định là `neo4j/neo4j`. Vì Neo4j sẽ yêu cầu người dùng thay đổi password trong lần đầu đăng nhập, do đó việc sử dụng tùy chọn này sẽ bỏ qua quá trình đó.
-- Dòng cuối cùng của câu lệnh bắt đầu với nội dung: `neo4j:enterprise` chỉ ra rằng container sẽ chạy với Docker image `neo4j` và có phiên bản là `enterprise` (sẽ là image ứng phiên bản enterprise mới nhất, có thể chạy với phiên bản khác như `neo4j:3.5.9-enterprise`). Phần còn lại của dòng này là thành phần số 2: phần khởi chạy container.<br>
+- Dòng cuối cùng của câu lệnh bắt đầu với nội dung: `neo4j:enterprise` chỉ ra rằng container sẽ chạy với Docker image `neo4j` với phiên bản `enterprise` mới nhất (có thể chạy với phiên bản khác như `neo4j:3.5.9-enterprise`). Phần còn lại của dòng này là thành phần số 2: phần khởi chạy container.<br>
 
 **Phần khởi chạy container**: Mục tiêu của việc khởi chạy container này là sao lưu dữ liệu từ một backup server (container đang khởi chạy này đóng vai trò backup client). Do đó, cần cung cấp câu lệnh thực hiện sao lưu để container này thực hiện. Nội dung của câu lệnh này là:
 ```
@@ -252,7 +252,7 @@ Câu lệnh trên gồm 2 phần: Phần khởi tạo container và Phần khở
    - Dòng thứ tư bind mount thư mục `/import`. Các file csv có thể được sao chép vào đây cho việc thực hiện import trong Neo4j. Script cho việc thực hiện import cũng có thể được đặt vào thư mục này để thực hiện import.
    - Tùy chọn -v cuối cùng bind mount thư mục `/plugins`. Các extension, thư viện như Neo4j APOC hoặc các thư viện giải thuật đồ thị có thể được thêm vào đây (dưới dạng các file jars) để Neo4j trong Docker container có thể truy cập được.
 - Tùy chọn `--env`. Dòng này đặt tài khoản để đăng nhập vào Neo4j instance với tên người dùng và mật khẩu. Tài khoản đăng nhập mặc định là `neo4j/neo4j`. Vì Neo4j sẽ yêu cầu người dùng thay đổi password trong lần đầu đăng nhập, do đó việc sử dụng tuỳ chọn này sẽ bỏ qua quá trình đó.
-- Dòng cuối cùng của câu lệnh bắt đầu với nội dung: `neo4j:enterprise` chỉ ra rằng container sẽ chạy với Docker image `neo4j` và có phiên bản là `enterprise` (sẽ là image ứng phiên bản enterprise mới nhất, có thể chạy với phiên bản khác như `neo4j:3.5.9-enterprise`). Phần còn lại của dòng này là thành phần số 2: phần khởi chạy container.<br>
+- Dòng cuối cùng của câu lệnh bắt đầu với nội dung: `neo4j:enterprise` chỉ ra rằng container sẽ chạy với Docker image `neo4j` với phiên bản `enterprise` mới nhất (có thể chạy với phiên bản khác như `neo4j:3.5.9-enterprise`). Phần còn lại của dòng này là thành phần số 2: phần khởi chạy container.<br>
 
 **Phần khởi chạy container**: Mục tiêu của việc khởi chạy container này khôi phục dữ liệu từ dữ liệu sao lưu. Do đó, khi khởi chạy, container này sẽ phải thực hiện 2 bước: Bước 1 - Khôi phục dữ liệu từ dữ liệu sao lưu; Bước 2 - Khởi chạy Neo4j instance với dữ liệu đã được khôi phục. Câu lệnh để thực hiện 2 nhiệm vụ trên như sau:
 ```
