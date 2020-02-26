@@ -32,5 +32,5 @@ Nếu muốn đổi tham số (địa chỉ cài đặt các services) mà khôn
 * Tạo file ```env.list``` với giá trị mới cho tham số<br>
 * Thêm tham số ```--env-file``` vào lệnh run image, ví dụ như:
 ```
-docker run -p 3001:3001 -d --name --env-file env.list storage-api-docs-container storage-api-docs
+docker run -p 3002:3002 -d --name --env-file env.list storage-api-docs-container storage-api-docs
 ```
