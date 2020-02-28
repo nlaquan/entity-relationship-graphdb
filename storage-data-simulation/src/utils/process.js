@@ -1,19 +1,7 @@
 const { loadDates } = require('./misc');
 const childProcess = require('child_process');
 const { THRESSHOLD } = require('../config');
-const { rdEntity, writeToCSVWithoutHeader } = require('./misc');
-
-async function saveNews(nth, start, end, dates) {
-  const numberOfNews = end - start;
-  path = `import/entities/news/news-part${nth}.csv`;
-  dataArr = Array.from(new Array(numberOfNews), (_, i) => ({
-    'newsId:ID(News-ID)': start + i,
-    'link': `https://link-to-new-${start + i}`,
-    'date:date': rdEntity(dates),
-    ':LABEL': 'News'
-  }))
-  await writeToCSVWithoutHeader(`news_${nth}`, dataArr, path);
-}
+const { saveNews } = require('../genData/utils');
 
 async function saveNewsUseChildProcess(numberOfNews) {
   const dates = await loadDates();

@@ -1,9 +1,9 @@
 const random = require('random');
-const { capitalize, lowerCase } = require('lodash');
+const { capitalize, toLower } = require('lodash');
 const {
-  writeToCSV, rdEntity, writeToCSVWithoutHeader
+  rdEntity, writeToCSVWithoutHeader
 } = require('../utils/misc');
-const { THRESSHOLD, RELS_MAP } = require('../config');
+const { RELS_MAP } = require('../config');
 
 function createMeetFact(maxPersonId) {
   const sId = random.int(0, maxPersonId);
@@ -69,7 +69,7 @@ function createTakePlaceFact(numberOfEvent, numberOfLocation) {
 }
 
 async function saveEntity(label, nth, start, end) {
-  path = `import/entities/${label}/${label}-part${nth}.csv`;
+  path = `import/entities/${label}/${toLower(label)}_part${nth}.csv`;
   displayName = `${label}_part_${nth + 1}`;
   const capitalLabel = capitalize(label);
   const numberOfEntities = end - start;
@@ -85,7 +85,7 @@ async function saveEntity(label, nth, start, end) {
 }
 
 async function saveName(label, nth, start, end) {
-  path = `import/entities/name/${lowerCase(label)}-hasName-part${nth}.csv`;
+  path = `import/entities/Name/${toLower(label)}_name_part${nth}.csv`;
   displayName = `${label}_part_${nth + 1}`;
   const capitalLabel = capitalize(label);
   const numberOfEntities = end - start;
@@ -100,7 +100,7 @@ async function saveName(label, nth, start, end) {
 }
 
 async function saveHasName(label, nth, start, end) {
-  path = `import/rels/hasName/${lowerCase(label)}/hasName-part${nth}.csv`;
+  path = `import/rels/has_name/${toLower(label)}/has_name_part${nth}.csv`;
   displayName = `hasName_part_${nth + 1}`;
   const capitalLabel = capitalize(label);
   const numberOfEntities = end - start;
@@ -117,7 +117,7 @@ async function saveHasName(label, nth, start, end) {
 
 async function saveNews(nth, start, end, dates) {
   const numberOfNews = end - start;
-  path = `import/entities/news/news-part${nth}.csv`;
+  path = `import/entities/News/news_part${nth}.csv`;
   dataArr = Array.from(new Array(numberOfNews), (_, i) => ({
     'newsId:ID(News-ID)': start + i,
     'link': `https://link-to-new-${start + i}`,

@@ -3,8 +3,8 @@ const {
   saveNewsUseChildProcess,
   saveEntitiesNameUseChildProcess
 } = require('./utils/process');
-const { rd, loadDates, rdEntity } = require('./utils/misc');
-const { THRESSHOLD, FACTS_PER_NEWS, LABEL_HAS_MANY_NAME } = require('./config');
+const { rd, loadDates } = require('./utils/misc');
+const { THRESSHOLD, FACTS_PER_NEWS } = require('./config');
 const { createScript } = require('./utils/script');
 const { readConfig, prepare, saveTime } = require('./utils/prepare');
 const { writeToCSVWithoutHeader } = require('./utils/misc');
@@ -92,23 +92,23 @@ const hierarchy = {
       }
 
       try {
-        path = `import/entities/fact/fact-part${relNth}${nth}.csv`;
+        path = `import/entities/Fact/fact_part${relNth}_${nth}.csv`;
         displayName = `fact_${relNth}${nth}`;
         await writeToCSVWithoutHeader(displayName, facts, path);
 
-        path = `import/rels/hasFact/hasFact-part${relNth}${nth}.csv`;
+        path = `import/rels/has_fact/has_fact_part${relNth}_${nth}.csv`;
         displayName = `hasFact_${relNth}${nth}`
         await writeToCSVWithoutHeader(displayName, hasFacts, path);
 
-        path = `import/rels/${type}/hasSubject-part${relNth}${nth}.csv`;
+        path = `import/rels/${type}/has_subject_part${relNth}_${nth}.csv`;
         displayName = `${type}_hasSubject_${relNth}${nth}`;
         await writeToCSVWithoutHeader(displayName, hasSubjects, path);
 
-        path = `import/rels/${type}/hasObject-part${relNth}${nth}.csv`;
+        path = `import/rels/${type}/has_object_part${relNth}_${nth}.csv`;
         displayName = `${type}_hasObject_${relNth}${nth}`;
         await writeToCSVWithoutHeader(displayName, hasObjects, path);
 
-        path = `import/rels/${type}/hasTime-part.csv`;
+        path = `import/rels/${type}/has_time_part.csv`;
         displayName = `hasFact_${relNth}${nth}`;
         await writeToCSVWithoutHeader(displayName, hasTimes, path);
 
@@ -133,7 +133,7 @@ const hierarchy = {
 
   prepare(relMap, hierarchy, {
     entityRootFolder: `${hierarchy.root}/${hierarchy.subs[0]}`,
-    entityFolderNames: [...Object.keys(entities), "news", "fact", "time"],
+    entityFolderNames: [...Object.keys(entities)],
   }, {
     relRootFolder: `${hierarchy.root}/${hierarchy.subs[1]}`,
     relFolderNames: [...Object.keys(relMap)]
@@ -145,8 +145,8 @@ const hierarchy = {
   }
 
   createScript(
-    [...Object.keys(entities), "news", "fact", "time"],
-    [...facts.map(rel => rel.type), "hasFact", "hasName"]
+    [...Object.keys(entities)],
+    [...facts.map(rel => rel.type)]
   );
 
   saveEntitiesUseChildProcess({ ...entities });
