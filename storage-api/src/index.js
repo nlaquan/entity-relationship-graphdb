@@ -4,6 +4,7 @@ const multer = require('multer');
 const bodyParser = require('body-parser');
 const upload = multer({ dest: 'uploads/' });
 const readNeo4jConfig = require('./neo4jConfig');
+require('dotenv').config();
 
 app.use(cors());
 app.use(bodyParser.json());         // to support JSON-encoded bodies
@@ -83,7 +84,7 @@ app.post(`/${base}/news`,
   upload.single('file'), (req, res) => newsAPI.createNews(req, res)
 );
 
-const server = app.listen(3001, console.log(`dev-api listen at 3001`));
+const server = app.listen(process.env.PORT, console.log(`dev-api listen at ${process.env.PORT}`));
 
 process.on('SIGTERM', function () {
   server.close(function () {
