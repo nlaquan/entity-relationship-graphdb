@@ -66,10 +66,8 @@ function prepare(relMap, hierarchy, { entityRootFolder, entityFolderNames }, { r
   relFolderNames.forEach(rel => {
     const file1 = `${relRootFolder}/${rel}/has_subject_header.csv`;
     const file2 = `${relRootFolder}/${rel}/has_object_header.csv`;
-    const file3 = `${relRootFolder}/${rel}/has_time_header.csv`;
     createHeaderFileForRel(relMap[rel].subject, file1);
     createHeaderFileForRel(relMap[rel].object, file2);
-    createHeaderFileForRel("Time", file3);
   });
 
   entityFolderNames.forEach(e => {
@@ -92,11 +90,6 @@ function prepare(relMap, hierarchy, { entityRootFolder, entityFolderNames }, { r
 
   createHeaderFile(`${entityRootFolder}/Fact/fact_header.csv`, [
     { id: "factId", title: 'factId:ID(Fact-ID)' },
-    { id: "label", title: ':LABEL' }
-  ]);
-
-  createHeaderFile(`${entityRootFolder}/Time/time_header.csv`, [
-    { id: "timeId", title: 'timeId:ID(Time-ID)' },
     { id: "date", title: 'date:date' },
     { id: "label", title: ':LABEL' }
   ]);
@@ -116,17 +109,6 @@ function prepare(relMap, hierarchy, { entityRootFolder, entityFolderNames }, { r
       ])
     }
   });
-}
-
-async function saveTime(dates) {
-  path = `import/entities/Time/time_part.csv`;
-  dataArr = dates.map((d, i) => ({
-    'timeId:ID(Time-ID)': i,
-    'date:date': d,
-    ':LABEL': 'Time'
-  }));
-
-  await writeToCSVWithoutHeader(`time`, dataArr, path);
 }
 
 module.exports = {

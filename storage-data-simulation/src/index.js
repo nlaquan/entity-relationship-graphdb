@@ -3,7 +3,7 @@ const {
   saveNewsUseChildProcess,
   saveEntitiesNameUseChildProcess
 } = require('./utils/process');
-const { rd, loadDates } = require('./utils/misc');
+const { rd, loadDates, rdEntity } = require('./utils/misc');
 const { THRESSHOLD, FACTS_PER_NEWS } = require('./config');
 const { createScript } = require('./utils/script');
 const { readConfig, prepare, saveTime } = require('./utils/prepare');
@@ -75,6 +75,7 @@ const hierarchy = {
 
         facts.push({
           'factId:ID(Fact-ID)': i,
+          'date:date': rdEntity(dates),
           ':LABEL': 'Fact'
         });
 
@@ -84,11 +85,11 @@ const hierarchy = {
           ':TYPE': 'HAS_FACT'
         });
 
-        hasTimes.push({
-          ':START_ID(Fact-ID)': i,
-          ':END_ID(Time-ID)': rd(dates.length),
-          ':TYPE': 'HAS_TIME'
-        });
+        // hasTimes.push({
+        //   ':START_ID(Fact-ID)': i,
+        //   ':END_ID(Time-ID)': rd(dates.length),
+        //   ':TYPE': 'HAS_TIME'
+        // });
       }
 
       try {
@@ -108,9 +109,9 @@ const hierarchy = {
         displayName = `${type}_hasObject_${relNth}${nth}`;
         await writeToCSVWithoutHeader(displayName, hasObjects, path);
 
-        path = `import/rels/${type}/has_time_part.csv`;
-        displayName = `hasFact_${relNth}${nth}`;
-        await writeToCSVWithoutHeader(displayName, hasTimes, path);
+        // path = `import/rels/${type}/has_time_part.csv`;
+        // displayName = `hasFact_${relNth}${nth}`;
+        // await writeToCSVWithoutHeader(displayName, hasTimes, path);
 
         console.timeEnd(`-------- generate ${type}-relationship: ${nth + 1} times`);
       } catch (err) {
@@ -152,7 +153,7 @@ const hierarchy = {
   saveEntitiesUseChildProcess({ ...entities });
   saveEntitiesNameUseChildProcess({ ...entities });
   saveNewsUseChildProcess(currentNewsId + 1);
-  await saveTime(dates);
+  // await saveTime(dates);
 })();
 
 // function generateData(danh_sách_các_loại_thực_thể, danh_sách_các_loại_fact) {

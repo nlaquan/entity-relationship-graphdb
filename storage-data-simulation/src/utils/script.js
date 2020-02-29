@@ -36,7 +36,6 @@ function createScript(entities, relationships) {
         const folder = toLower(type);
         stream.write(`--relationships "import/rels/${folder}/has_subject_header.csv,import/rels/${folder}/has_subject_part.*" \\\n`);
         stream.write(`--relationships "import/rels/${folder}/has_object_header.csv,import/rels/${folder}/has_object_part.*" \\\n`);
-        stream.write(`--relationships "import/rels/${folder}/has_time_header.csv,import/rels/${folder}/has_time_part.*" \\\n`);
       }
     });
 
