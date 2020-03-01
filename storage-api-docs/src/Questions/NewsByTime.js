@@ -60,7 +60,7 @@ function NewsByTime({ question, apiDes }) {
         <hr />
         <EndpointTable details={apiDes} />
       </div>
-      <div className="col-md-7">
+      <div className="col-md-7 h-100 overflow-scroll">
         <h3>Demo</h3>
         <Form onSubmit={onSubmit}>
           <Form.Group as={Row}>

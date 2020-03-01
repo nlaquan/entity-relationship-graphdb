@@ -8,7 +8,7 @@ function Collapse({ children }) {
   return (
     <>
       <span
-        className="api_describe"
+        className="api-describe"
         onClick={() => setOpen(!open)}
       >
         Mô tả API

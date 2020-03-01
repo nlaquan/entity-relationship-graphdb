@@ -264,7 +264,7 @@ function App() {
   return (
     <div className="app container-fluid">
       <div className="row">
-        <div className="col-md-2">
+        <div className="col-md-2 h-100 overflow-scroll">
           <ListGroup>
             {
               questions.map((q, i) => (
@@ -278,7 +278,7 @@ function App() {
             }
           </ListGroup>
         </div>
-        <div className="col-md-10">
+        <div className="col-md-10 h-100">
           <Details question={currentQuestion} apiDes={API_DES[currentQuestion.id]} />
         </div>
       </div>
