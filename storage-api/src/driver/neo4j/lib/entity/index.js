@@ -233,17 +233,13 @@ const entityWithRelationshipByMonth = driver => ({
   const queryString =
     `match (s)<-[:HAS_SUBJECT_IN_${rel}]-(f)-[:HAS_OBJECT_IN_${rel}]->(o)
     where ID(s) = ${id}
-    with f, s, o
-    match (f)-[HAS_TIME]->(t)
-    with (apoc.date.fields(toString(t.date), 'yyyy-MM-dd')) as date, o
+    with (apoc.date.fields(toString(f.date), 'yyyy-MM-dd')) as date, s, o
     where date.months = ${month} and date.years = ${year}
     return distinct(o) as entity
     union
     match (s)<-[:HAS_SUBJECT_IN_${rel}]-(f)-[HAS_OBJECT_IN_${rel}]->(o)
     where ID(s) = ${id}
-    with f, s, o
-    match (f)-[HAS_TIME]->(t)
-    with (apoc.date.fields(toString(t.date), 'yyyy-MM-dd')) as date, s
+    with (apoc.date.fields(toString(f.date), 'yyyy-MM-dd')) as date, s, o
     where date.months = ${month} and date.years = ${year}
     return distinct(s) as entity`;
 
@@ -278,17 +274,13 @@ const entityWithRelationshipByQuarter = driver => ({
   const queryString =
     `match(s)<-[:HAS_SUBJECT_IN_${rel}]-(f)-[:HAS_OBJECT_IN_${rel}]->(o)
     where ID(s) = ${id}
-    with f, s, o
-    match (f)-[:HAS_TIME]->(t)
-    with (apoc.date.fields(toString(t.date), 'yyyy-MM-dd')) as date, o
+    with (apoc.date.fields(toString(f.date), 'yyyy-MM-dd')) as date, s, o
     where date.years = ${year} and date.months in [${QUARTERS[quarter]}]
     return distinct(o) as entity
     union
     match(s)<-[:HAS_SUBJECT_IN_${rel}]-(f)-[:HAS_OBJECT_IN_${rel}]->(o)
     where ID(s) = ${id}
-    with f, s, o
-    match (f)-[:HAS_TIME]->(t)
-    with (apoc.date.fields(toString(t.date), 'yyyy-MM-dd')) as date, s
+    with (apoc.date.fields(toString(f.date), 'yyyy-MM-dd')) as date, s, o
     where date.years = ${year} and date.months in [${QUARTERS[quarter]}]
     return distinct(s) as entity`;
 

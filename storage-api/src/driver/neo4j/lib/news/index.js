@@ -1,5 +1,4 @@
-const { getData, format, collectAndRemoveDuplicate } = require('../../../../api/utils');
-const { capitalize } = require('lodash');
+const { format, collectAndRemoveDuplicate } = require('../../../../api/utils');
 const removeEmptyLines = require("remove-blank-lines");
 
 // get entity and relationship from a news or list of news
@@ -120,22 +119,17 @@ const createNews = driver => async (jsonData) => {
       match (e${i}:${e.label}) where ID(e${i})=${e.identity}`
     }
 
-    if (e.label === "Time") {
-      const date = e.time.split('-');
-      return `${acc}
-      merge (e${i}:Time {date: date({year: ${date[0]}, month: ${date[1]}, day: ${date[2]}})})`;
-    }
-
     return `${acc}
       create (e${i}:${e.label} {name: '${e.name}', description: '${e.description}'})
       merge (name${i}:Name {value: '${e.name}'})
       create (e${i})-[:HAS_NAME]->(name${i})`
   }, '');
 
-  const partialQueryStringForFact = rels.reduce((acc, _, i) =>
-    `${acc}
-      create (f${i}:Fact)`
-    , '');
+  const partialQueryStringForFact = rels.reduce((acc, rel, i) => {
+    const date = rel.date.split('-');
+    return `${acc}
+    create (f${i}:Fact {date: date({year: ${date[0]}, month: ${date[1]}, day: ${date[2]}})})`
+  }, '');
 
   const partialQueryStringForRel = rels.reduce((acc, r, i) => {
     const rel = r.relationship.toUpperCase();
@@ -143,7 +137,6 @@ const createNews = driver => async (jsonData) => {
       `${acc}
       create (f${i})-[:HAS_SUBJECT_IN_${rel}]->(e${entityMap.get(r.subjectId)})
       create (f${i})-[:HAS_OBJECT_IN_${rel}]->(e${entityMap.get(r.objectId)})
-      create (f${i})-[:HAS_TIME]->(e${entityMap.get(r.timeId)})
       `;
     return query;
   }, '');
