@@ -22,7 +22,6 @@ function NewsAPI(service) {
    * @param {*} res
    */
   async function getNews(req, res) {
-    console.log('run get news');
     const links = seperate(req.query.links);
 
     withTryCatch({

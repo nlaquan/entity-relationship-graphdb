@@ -11,7 +11,7 @@ const news = driver => (links) => {
       `match (n:News {link: '${links[0]}'})-[r1]->(f)-[r2]->(o) return n, r1, f, r2, o`
   } else {
     const linksString = links.reduce((acc, id, i) => {
-      if (i === ids.length - 1) {
+      if (i === links.length - 1) {
         acc += `'${id}']`;
       } else if (i === 0) {
         acc += `['${id}',`
