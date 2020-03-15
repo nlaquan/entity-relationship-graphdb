@@ -16,6 +16,10 @@ table tbody tr td {
   overflow: scroll;
 }
 
+.list-group {
+  cursor: pointer;
+}
+
 .wrap-description {
   border-right: 1px solid rgba(0,0,0,.1);;
 }
